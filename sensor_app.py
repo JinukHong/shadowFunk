@@ -128,5 +128,9 @@ hide_footer_style = """
 #MainMenu {visibility: hidden;} 
 footer {visibility: hidden;} 
 div.block-container {padding-top:2rem;}
+#GithubIcon {
+  visibility: hidden;
+}
+.viewerBadge_container__r5tak {display: none;}
 """
 st.markdown(hide_footer_style, unsafe_allow_html=True)
