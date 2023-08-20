@@ -5,17 +5,27 @@ import datetime
 import collections
 import openai
 
+st.set_page_config(page_title="Seinfarm in Your Hand",
+                   page_icon="👨‍🌾",
+                   layout="wide",
+                   )
 
 openai.api_key = st.secrets["secrets"]['OPENAI_API_KEY']
 
 
 st.title('Sein Farm in your hand')
-tab1, tab2, tab3= st.tabs(['Tab A' , 'Tab B', 'Tab C'])
+tab1, tab2, tab3= st.tabs(['Beranda' , 'Statistik', 'Tanya Seina'])
 
 with tab1:
-    st.header('About Sein Farm')
-
-
+    st.subheader('About Sein Farm')
+    col1, col2 = st.columns([1,1])
+    towriteincol1 = "Sein Farm atau Sekelama Integrated Farming adalah salah satu merk inovasi pertanian terpadu di Kota Bandung yang menggabungkan "\
+        "unsur – unsur pertanian, peternakan dan perikanan. Sekelama sendiri diambil dari nama jalan dimana SEIN FARM berada yaitu di Jalan Sekemala"\
+        " kelurahan Pasanggrahan, Kecamatan Ujungberung, Kota Bandung. Daerah ini merupakan daerah terluar dari Kota Bandung yang terdapat sawah abadi "\
+        "milik PEMKOT Bandung."
+    col1.write(towriteincol1)
+    # col2.image("https://buruansae.bandung.go.id/wp-content/uploads/2020/09/WhatsApp-Image-2020-09-19-at-16.34.00-770x428.jpeg")
+    col2.image("https://buruansae.bandung.go.id/wp-content/uploads/2021/12/Sein-Farm-2048x819.png")
 with tab2:
     st.write('Displaying dummy data for temperature and pH levels.')
 
@@ -54,8 +64,6 @@ with tab3:
         else:
             return "I'm sorry, I don't understand that."
 
-
-
     avg_temperature = data['Temperature'].mean()
     min_temperature = data['Temperature'].min()
     max_temperature = data['Temperature'].max()
@@ -72,34 +80,43 @@ with tab3:
     # Create the context message
 
     system_message = f"""
-    I am your AI secretary. Based on the data:
+    Data read from Arduino:
     - Average temperature: {avg_temperature:.2f}°C
     - Average pH level: {avg_pH:.2f}
     - Lowest pH level: {min_pH:.2f}
     - Highest pH level: {max_pH:.2f}
     {optimal_conditions}
-    Given this information, how can I assist you?
     """
 
 
     # Chatbot interface
-    user_message = st.text_input("Ask the AI Secretary:")
-
+    user_message = st.text_input("Ask Seina about everything:")
 
     if not user_message:
-        user_message = "Given this information, what would be your advice?"
+        # DON'T FORGET TO UNCOMMENT THIS PART AFTER TESTING
+        # user_message = "Given the data previously, what would be your advice?" 
+        pass
 
 
     # User's message
-    prompt = user_message
 
+    seina_message = "Mulai dari sekarang, kamu akan berperan sebagai Seina, bot serba tau yang ramah, yang akan menjawab semua pertanyaan seputar Sein Farm" \
+    "dan fakta fakta seputar pertanian dan peternakan ikan. Kamu akan menyapa dengan \"Hai👋, aku Seina, terimakasih sudah bertanya😊\"" \
+    ", dan kemudian kamu akan menjawab pertanyaan berikut: "
+
+    ending_message = """
+    (kemudian tulis juga jawaban yang sama namun dalam bahasa inggris, dipisahkan dengan separator line)
+    """
+    prompt = seina_message + user_message + ending_message
     # Response from the API
-    completion = openai.ChatCompletion.create(model="gpt-3.5-turbo",
-                                            messages=[
-                                                {"role": "system", "content": system_message},
-                                                {"role": "user", "content": prompt}
-                                            ])
+    if user_message:
+        with st.spinner(text="Wait for a moment, Seina is still thinking🤔..."):
+            completion = openai.ChatCompletion.create(model="gpt-3.5-turbo",
+                                                    messages=[
+                                                        {"role": "system", "content": system_message},
+                                                        {"role": "user", "content": prompt}
+                                                    ])
 
-    # Extract the response
-    response = completion.choices[0].message.content
-    st.write(f"AI Secretary: {response}")
+        # Extract the response
+        response = completion.choices[0].message.content
+        st.write(f"Seina: {response}")
