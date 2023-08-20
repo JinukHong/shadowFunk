@@ -124,13 +124,15 @@ with tab3:
 
 hide_footer_style = """
 <style>
-.reportview-container .main footer {visibility: hidden;}   
-#MainMenu {visibility: hidden;} 
-footer {visibility: hidden;} 
+.reportview-container .main footer {visibility: hidden !important;}   
+#MainMenu {visibility: hidden !important;} 
+footer {visibility: hidden !important;} 
 div.block-container {padding-top:2rem;}
-#GithubIcon {
-  visibility: hidden;
+.css-1jc7ptx, .e1ewe7hr3, .viewerBadge_container__1QSob,
+.styles_viewerBadge__1yB5_, .viewerBadge_link__1S137,
+.viewerBadge_text__1JaDK {
+    display: none;
 }
-.viewerBadge_container__r5tak {display: none;}
+</style>
 """
 st.markdown(hide_footer_style, unsafe_allow_html=True)
