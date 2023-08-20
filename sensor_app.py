@@ -17,6 +17,7 @@ st.title('Sein Farm in your hand')
 tab1, tab2, tab3= st.tabs(['Beranda' , 'Statistik', 'Tanya Seina'])
 
 with tab1:
+
     st.subheader('About Sein Farm')
     col1, col2 = st.columns([1,1])
     towriteincol1 = "Sein Farm atau Sekelama Integrated Farming adalah salah satu merk inovasi pertanian terpadu di Kota Bandung yang menggabungkan "\
@@ -90,8 +91,8 @@ with tab3:
 
 
     # Chatbot interface
-    user_message = st.text_input("Ask Seina about everything:")
-
+    user_message = st.text_input("Tanya Seina tentang apapun:", placeholder="Ketik disini, kemudian tekan Enter")
+    
     if not user_message:
         # DON'T FORGET TO UNCOMMENT THIS PART AFTER TESTING
         # user_message = "Given the data previously, what would be your advice?" 
@@ -110,7 +111,7 @@ with tab3:
     prompt = seina_message + user_message + ending_message
     # Response from the API
     if user_message:
-        with st.spinner(text="Wait for a moment, Seina is still thinking🤔..."):
+        with st.spinner(text="Tunggu sebentar, Seina masih berpikir🤔..."):
             completion = openai.ChatCompletion.create(model="gpt-3.5-turbo",
                                                     messages=[
                                                         {"role": "system", "content": system_message},
@@ -120,3 +121,12 @@ with tab3:
         # Extract the response
         response = completion.choices[0].message.content
         st.write(f"Seina: {response}")
+
+hide_footer_style = """
+<style>
+.reportview-container .main footer {visibility: hidden;}   
+#MainMenu {visibility: hidden;} 
+footer {visibility: hidden;} 
+div.block-container {padding-top:2rem;}
+"""
+st.markdown(hide_footer_style, unsafe_allow_html=True)
