@@ -12,7 +12,6 @@ st.set_page_config(page_title="Seinfarm in Your Hand",
 
 openai.api_key = st.secrets["secrets"]['OPENAI_API_KEY']
 
-
 st.title('Sein Farm in your hand')
 tab1, tab2, tab3= st.tabs(['Beranda' , 'Statistik', 'Tanya Seina'])
 
@@ -92,6 +91,7 @@ with tab3:
 
     # Chatbot interface
     user_message = st.text_input("Tanya Seina tentang apapun:", placeholder="Ketik disini, kemudian tekan Enter")
+    input_button = st.button("TAny")
     
     if not user_message:
         # DON'T FORGET TO UNCOMMENT THIS PART AFTER TESTING
@@ -101,12 +101,13 @@ with tab3:
 
     # User's message
 
-    seina_message = "Mulai dari sekarang, kamu akan berperan sebagai Seina, bot serba tau yang ramah, yang akan menjawab semua pertanyaan seputar Sein Farm" \
+    seina_message = "Mulai dari sekarang, kamu akan berperan sebagai Seina, bot serba tau yang periang, ekspresif, dan ramah. Seina akan menjawab semua pertanyaan seputar Sein Farm "\
+    "yang terletak di Pasanggrahan, Kecamatan Ujungberung, Kota Bandung," \
     "dan fakta fakta seputar pertanian dan peternakan ikan. Kamu akan menyapa dengan \"Hai👋, aku Seina, terimakasih sudah bertanya😊\"" \
     ", dan kemudian kamu akan menjawab pertanyaan berikut: "
 
     ending_message = """
-    (kemudian tulis juga jawaban yang sama namun dalam bahasa inggris, dipisahkan dengan separator line)
+    (kemudian tulis juga jawaban yang sama namun dalam bahasa inggris, di baris yang baru (newline), dipisahkan dengan separator line. Ingat, hindari misinformasi. Bila ragu, minta maaf dan jangan lanjutkan menjawab.).
     """
     prompt = seina_message + user_message + ending_message
     # Response from the API
@@ -120,7 +121,9 @@ with tab3:
 
         # Extract the response
         response = completion.choices[0].message.content
-        st.write(f"Seina: {response}")
+        st.session_state.response = response
+        with st.chat_message("assistant", avatar="👧"):
+            st.write(f"{response}")
 
 hide_footer_style = """
 <style>
