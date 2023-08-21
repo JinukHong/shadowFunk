@@ -200,7 +200,7 @@ with tab2:
                     col1, col2 = st.columns(2)
 
                     with col1:
-                        fig_temp = px.line(df, x="Waktu Kejadian", y='Nilai Temp (Celsius) Air', title='pH vs Date and Time')
+                        fig_temp = px.line(df, x="Waktu Kejadian", y='Nilai Temp (Celcius) Air', title='pH vs Date and Time')
                         fig_temp.update_xaxes(title_text="Time")
                         fig_temp.update_yaxes(title_text="°C")
                         st.plotly_chart(fig_temp)
