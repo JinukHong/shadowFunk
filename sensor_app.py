@@ -4,6 +4,16 @@ import numpy as np
 import datetime
 import collections
 import openai
+import time
+from streamlit_extras.streaming_write import write
+from streamlit_extras.row import row
+from deep_translator import GoogleTranslator
+
+def chatwrite(texttowrite):
+    lines = texttowrite.split('\n')
+    for line in lines:
+        yield line + "\n"
+        time.sleep(0.05)
 
 st.set_page_config(page_title="Seinfarm in Your Hand",
                    page_icon="👨‍🌾",
@@ -89,9 +99,10 @@ with tab3:
     """
 
     # Chatbot interface
-    
-    user_message = st.text_input("Tanya Seina tentang apapun:", placeholder="Ketik disini, kemudian tekan tombol \"Tanya\"")
-    input_button = st.button("Tanya", use_container_width=True)
+    st.caption("Tanya Seina tentang apapun:")
+    chat_row = row([9,1])
+    user_message = chat_row.text_input("label", placeholder="Ketik disini, kemudian tekan tombol \"Tanya\"", label_visibility="collapsed")
+    input_button = chat_row.button("Tanya")
     
 
     if not user_message:
@@ -108,7 +119,7 @@ with tab3:
     ", dan kemudian kamu akan menjawab pertanyaan berikut: "
 
     ending_message = """
-    (kemudian tulis juga jawaban yang sama namun dalam bahasa inggris. Jawaban bahasa inggris akan berada di baris berikutnya, dipisahkan dengan baris kosong/newline. Ingat, hindari misinformasi. Bila ragu, minta maaf dan jangan lanjutkan menjawab.).
+    (Ingat, hindari misinformasi. Bila ragu, minta maaf dan jangan lanjutkan menjawab.).
     """
     prompt = seina_message + user_message + ending_message
     # Response from the API
@@ -122,9 +133,16 @@ with tab3:
 
         # Extract the response
         response = completion.choices[0].message.content
-        st.session_state.response = response
+        with st.spinner(text="Seina sedang menerjemahkan jawaban😉..."):
+            translated_response = GoogleTranslator(source='id', target='en').translate(response) 
+
+        # final_response = response + "\n" + "-" * 30 + "\n" + translated_response
         with st.chat_message("assistant", avatar="👧"):
-            st.write(f"{response}")
+            # st.write(f"{response}")
+            write(chatwrite(response))
+            st.divider()
+            write(chatwrite(translated_response))
+
 
 hide_footer_style = """
 <style>
@@ -140,3 +158,12 @@ div.block-container {padding-top:2rem;}
 </style>
 """
 st.markdown(hide_footer_style, unsafe_allow_html=True)
+
+custom_css = """
+<style>
+[data-testid=column]:nth-of-type(1) [data-testid=stMarkdown]{
+    gap: 0rem;
+}
+</style>
+"""
+st.markdown(custom_css, unsafe_allow_html=True)
