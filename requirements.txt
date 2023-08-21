@@ -3,6 +3,7 @@ streamlit-extras
 seleniumbase
 webdriver-manager
 lxml
+fake_useragent
 deep_translator
 numpy
 pandas

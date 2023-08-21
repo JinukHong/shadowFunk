@@ -13,6 +13,8 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from fake_useragent import UserAgent
+
 
 def chatwrite(texttowrite):
     lines = texttowrite.split('\n')
@@ -21,12 +23,16 @@ def chatwrite(texttowrite):
         time.sleep(0.05)
 
 def get_driver():
+    random_user_agent = user_agent.random
     options = Options()
     options.add_argument('--disable-gpu')
     options.add_argument('--headless')
+    options.add_argument(f'--user-agent={random_user_agent}') 
     x = ChromeDriverManager(driver_version="116.0.5845.96").install()
     service = Service(x)
     return webdriver.Chrome(service=service, options=options)
+
+user_agent = UserAgent()
 
 st.set_page_config(page_title="Seinfarm in Your Hand",
                    page_icon="👨‍🌾",
@@ -91,7 +97,7 @@ with tab2:
         target_condition = driver.find_element("xpath", condition_xpath)
         # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
         driver.quit()
-        
+
         col_t, col_c = st.columns(2)
         col_t.metric(label=str(target_temperature.text).split("\n")[0], value=str(target_temperature.text).split("\n")[1])
         col_c.metric(label=str(target_condition.text).split("\n")[0], value=str(target_condition.text).split("\n")[1])
