@@ -25,7 +25,7 @@ def chatwrite(texttowrite):
         time.sleep(0.05)
 
 @st.cache_data(ttl=300, show_spinner="Retrieving from cache...")
-def get_driver(link, wait, firstxpath=None, secondxpath=None):
+def get_driver(link, wait, firstxpath=None, secondxpath=None, thirdxpath=None, firsttablexpath=None, secondtablexpath=None):
     random_user_agent = user_agent.random
     options = Options()
     options.add_argument('--disable-gpu')
@@ -44,6 +44,17 @@ def get_driver(link, wait, firstxpath=None, secondxpath=None):
     if secondxpath:
         secondtext = driver.find_element("xpath", secondxpath).text
         output.append(str(secondtext))
+    if thirdxpath:
+        thirdtext = driver.find_element("xpath", thirdxpath).text
+        output.append(str(thirdtext))
+    if firsttablexpath:
+        firsttable = driver.find_element("xpath", firsttablexpath)
+        first_html = firsttable.get_attribute('outerHTML')
+        output.append(str(first_html))
+    if secondtablexpath:
+        secondtable = driver.find_element("xpath", secondtablexpath)
+        second_html = secondtable.get_attribute('outerHTML')
+        output.append(str(second_html))
     driver.quit()
     return output
     
@@ -75,8 +86,8 @@ with tab1:
 
 with tab2:
     st.write("Sensors provider:")
-    # shadowfunk_tab, psyteam_tab, inkofarm_tab, hihello_tab, ie_tab = st.tabs(["shadowfunk", "psyteam", "inko farm", "hihello", "IE"])
-    shadowfunk_tab, psyteam_tab, inkofarm_tab = st.tabs(["shadowfunk", "psyteam", "inko farm"])
+    shadowfunk_tab, psyteam_tab, inkofarm_tab, hihello_tab, ie_tab = st.tabs(["shadowfunk", "psyteam", "inko farm", "hihello", "IE"])
+    # shadowfunk_tab, psyteam_tab, inkofarm_tab = st.tabs(["shadowfunk", "psyteam", "inko farm"])
 
     def generate_data(id):
         THINGSPK_CHANNEL_ID = id
@@ -154,103 +165,84 @@ with tab2:
             st.components.v1.iframe("https://thingspeak.com/channels/2246150/widgets/698517", height=400)
 
         
-    # with hihello_tab:
-    #     st.markdown("Taken from Hihello's [website](https://hifish.serv00.net/)")
+    with hihello_tab:
+        st.markdown("Taken from Hihello's [website](https://hifish.serv00.net/)")
 
-    #     if platform.system() == "Linux":
-    #         with st.spinner(text="Retrieving data..."):
-    #             driver = get_driver()
-    #             driver.get("https://hifish.serv00.net/")
-    #             driver.implicitly_wait(3)
-    #             time.sleep(3)
+        if platform.system() == "Linux":
+            with st.spinner(text="Retrieving data..."):
+                retrieved_data = get_driver("https://hifish.serv00.net/",
+                                            3, "/html/body/div[1]/div[2]/div[2]/div/div[2]/p",
+                                            "/html/body/div[1]/div[2]/div[1]/div/div[2]/p", None,
+                                            "/html/body/div[2]/div/div[2]/table", "/html/body/div[2]/div/div[1]/table") 
+                                            #temperature, ph, phtemptable, feedtable
+                
+                
+                col_t, col_ph = st.columns(2)
+                col_t.metric(label=retrieved_data[0].split()[0], value=str(retrieved_data[0].split()[1]))
+                col_ph.metric(label=retrieved_data[1].split()[0], value=str(retrieved_data[1].split()[1]))
+                style_metric_cards()
+                
+                phtemp_dfs = pd.read_html(retrieved_data[2])
 
-    #             def gettext(path):
-    #                 return str(driver.find_element("xpath", path).text)
-                
-    #             temp_value = gettext("/html/body/div[1]/div[2]/div[2]/div/div[2]/p")
-    #             ph_value = gettext("/html/body/div[1]/div[2]/div[1]/div/div[2]/p")
-    #             phtemptable = driver.find_element("xpath", "/html/body/div[2]/div/div[2]/table")
-    #             feedtable = driver.find_element("xpath", "/html/body/div[2]/div/div[1]/table")
-                
-    #             # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
-                
-    #             col_t, col_ph = st.columns(2)
-    #             col_t.metric(label=temp_value.split()[0], value=str(temp_value.split()[1]))
-    #             col_ph.metric(label=ph_value.split()[0], value=str(ph_value.split()[1]))
-    #             style_metric_cards()
-                
-    #             phtemp_html = phtemptable.get_attribute('outerHTML')
-    #             phtemp_dfs = pd.read_html(phtemp_html)
+                if phtemp_dfs:
+                    phtemp_df = phtemp_dfs[0]
+                    # st.write(df)
+                    col1, col2 = st.columns(2)
 
-    #             if phtemp_dfs:
-    #                 phtemp_df = phtemp_dfs[0]
-    #                 # st.write(df)
-    #                 col1, col2 = st.columns(2)
-
-    #                 with col1:
-    #                     fig_temp = px.line(phtemp_df, x="Waktu Kejadian", y='Nilai Temp (Celcius) Air', title='pH vs Date and Time')
-    #                     fig_temp.update_xaxes(title_text="Time", autorange='reversed')
-    #                     fig_temp.update_yaxes(title_text="°C")
-    #                     st.plotly_chart(fig_temp, use_container_width=True)
+                    with col1:
+                        fig_temp = px.line(phtemp_df, x="Waktu Kejadian", y='Nilai Temp (Celcius) Air', title='pH vs Date and Time')
+                        fig_temp.update_xaxes(title_text="Time", autorange='reversed')
+                        fig_temp.update_yaxes(title_text="°C")
+                        st.plotly_chart(fig_temp, use_container_width=True)
                         
-    #                 with col2:
-    #                     fig_pH = px.line(phtemp_df, x="Waktu Kejadian", y='Nilai pH Air', title='pH vs Date and Time')
-    #                     fig_pH.update_xaxes(title_text="Time", autorange='reversed')
-    #                     fig_pH.update_yaxes(title_text="pH")
-    #                     st.plotly_chart(fig_pH, use_container_width=True)
+                    with col2:
+                        fig_pH = px.line(phtemp_df, x="Waktu Kejadian", y='Nilai pH Air', title='pH vs Date and Time')
+                        fig_pH.update_xaxes(title_text="Time", autorange='reversed')
+                        fig_pH.update_yaxes(title_text="pH")
+                        st.plotly_chart(fig_pH, use_container_width=True)
 
-    #             else:
-    #                 st.write("No table data found")
+                else:
+                    st.write("No table data found")
 
-    #             feed_html = feedtable.get_attribute('outerHTML')
-    #             feed_dfs = pd.read_html(feed_html)
+                feed_dfs = pd.read_html(retrieved_data[3])
                     
-    #             if feed_dfs:
-    #                 feed_df = feed_dfs[0]
-    #                 # st.write(feed_df)
-    #                 fig = px.scatter(
-    #                     feed_df, 
-    #                     x="Waktu Kejadian",
-    #                     y='Status HiFish',
-    #                     title='Machine Status Scatter Plot'
-    #                 )
+                if feed_dfs:
+                    feed_df = feed_dfs[0]
+                    # st.write(feed_df)
+                    fig = px.scatter(
+                        feed_df, 
+                        x="Waktu Kejadian",
+                        y='Status HiFish',
+                        title='Machine Status Scatter Plot'
+                    )
 
-    #                 # Customize the x-axis label and layout
-    #                 fig.update_xaxes(title_text="Time")
-    #                 fig.update_layout(showlegend=False)
+                    # Customize the x-axis label and layout
+                    fig.update_xaxes(title_text="Time")
+                    fig.update_layout(showlegend=False)
 
-    #                 # Display the plot
-    #                 st.plotly_chart(fig, use_container_width=True)
-    #             else:
-    #                 st.write("No table data found")
+                    # Display the plot
+                    st.plotly_chart(fig, use_container_width=True)
+                else:
+                    st.write("No table data found")
                     
-    #             driver.quit()
+    with ie_tab:
+        st.markdown("Taken from ie's Thinger dashboard")
 
-    # with ie_tab:
-    #     st.markdown("Taken from ie's Thinger dashboard")
+        if platform.system() == "Linux":
+            with st.spinner(text="Retrieving data..."):
+                retrieved_data = get_driver(f"https://console.thinger.io/dashboards/ESP32?authorization={thingerauth}", 5,
+                           "/html/body/ui-view/div/div[1]/div[2]/dashboard/div/div[3]/div/div/div/div/ul/li[2]/div/div[2]/div/div/div/donutchart-widget/div/div/span",
+                           "/html/body/ui-view/div/div[1]/div[2]/dashboard/div/div[3]/div/div/div/div/ul/li[3]/div/div[2]/div/div/div/donutchart-widget/div/div/span",
+                           "/html/body/ui-view/div/div[1]/div[2]/dashboard/div/div[3]/div/div/div/div/ul/li[4]/div/div[2]/div/div/div/donutchart-widget/div/div/span")
+                            # temperature, ammonia, ph
 
-    #     if platform.system() == "Linux":
-    #         with st.spinner(text="Retrieving data..."):
-    #             driver = get_driver()
-    #             driver.get(f"https://console.thinger.io/dashboards/ESP32?authorization={thingerauth}")
-    #             driver.implicitly_wait(5)
-    #             time.sleep(5)
-
-    #             def gettext(path):
-    #                 return str(driver.find_element("xpath", path).text)
+                # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
                 
-    #             temp_value = gettext("/html/body/ui-view/div/div[1]/div[2]/dashboard/div/div[3]/div/div/div/div/ul/li[2]/div/div[2]/div/div/div/donutchart-widget/div/div/span")
-    #             nh3_value = gettext("/html/body/ui-view/div/div[1]/div[2]/dashboard/div/div[3]/div/div/div/div/ul/li[3]/div/div[2]/div/div/div/donutchart-widget/div/div/span")
-    #             ph_value = gettext("/html/body/ui-view/div/div[1]/div[2]/dashboard/div/div[3]/div/div/div/div/ul/li[4]/div/div[2]/div/div/div/donutchart-widget/div/div/span")
-                
-    #             # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
-                
-    #             col_t, col_nh3, col_ph = st.columns(3)
-    #             col_t.metric(label="Temperature", value=str(temp_value))
-    #             col_nh3.metric(label="Ammonia", value=str(nh3_value))
-    #             col_ph.metric(label="pH", value=str(ph_value))
-    #             style_metric_cards()
-    #             driver.quit()
+                col_t, col_nh3, col_ph = st.columns(3)
+                col_t.metric(label="Temperature", value=retrieved_data[0])
+                col_nh3.metric(label="Ammonia", value=retrieved_data[1])
+                col_ph.metric(label="pH", value=retrieved_data[2])
+                style_metric_cards()
 
 with tab3:
         # Mock GPT-based API
@@ -333,18 +325,61 @@ with tab3:
             st.divider()
             write(chatwrite(translated_response))
 
+hide_footer_style = """
+<style>
+#MainMenu {visibility: hidden;} 
+div.block-container {padding-top:2rem;}
+}
+</style>
+"""
+st.markdown(hide_footer_style, unsafe_allow_html=True)
 
-# hide_footer_style = """
-# <style>
-# .reportview-container .main footer {visibility: hidden !important;}   
-# #MainMenu {visibility: hidden !important;} 
-# footer {visibility: hidden !important;} 
-# div.block-container {padding-top:2rem;}
-# .css-1jc7ptx, .e1ewe7hr3, .viewerBadge_container__1QSob,
-# .styles_viewerBadge__1yB5_, .viewerBadge_link__1S137,
-# .viewerBadge_text__1JaDK {
-#     display: none;
-# }
-# </style>
-# """
-# st.markdown(hide_footer_style, unsafe_allow_html=True)
+footer_setup = '''
+<style>
+/* Style for the footer */
+.footer-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 5px;
+}
+
+.footer-text {
+    margin-right: auto;
+}
+
+.footer-logos {
+    display: flex;
+    align-items: center;
+}
+</style>
+
+<script>
+// To break out of iframe and access the parent window
+const streamlitDoc = window.parent.document;
+
+// Make the replacement
+document.addEventListener("DOMContentLoaded", function(event){
+    const footer = streamlitDoc.getElementsByTagName("footer")[0];
+    footer.innerHTML = `
+        <div class="footer-content">
+            <div class="footer-text">
+                Provided by 
+                <a href="https://windboy.pusan.ac.kr/issue/issueView?idx=863#solution3282" target="_blank" class="css-z3au9t egzxvld2">shadowfunk</a>
+            </div>
+            <div class="footer-logos">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/9/9f/Flag_of_Indonesia.svg" alt="Indonesian Flag" height="30">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/0f/Flag_of_South_Korea.png" alt="Korean Flag" height="30">
+                <img src="https://windboy.pusan.ac.kr/assets/files/group/csnsp2.png" alt="Creativity Station Logo" height="30">
+            </div>
+        </div>
+    `;
+});
+</script>
+'''
+
+st.components.v1.html(footer_setup)
