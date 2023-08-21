@@ -16,6 +16,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from fake_useragent import UserAgent
 import plotly.express as px
 import requests
+import platform
 
 def chatwrite(texttowrite):
     lines = texttowrite.split('\n')
@@ -83,35 +84,37 @@ with tab2:
         
         data = generate_data('2246162')
 
-    with col1 :
-        st.subheader('Temperature over Time')
-        fig1 = px.line(data, x="Time", y="°C", title='Temperature', markers=True)  # Assuming field1 is temperature
-        st.plotly_chart(fig1, use_container_width=True)
-    
-    with col2 :
-        st.subheader('pH Level over Time')
-        fig2 = px.line(data, x="Time", y="pH", title='pH', markers=True)  # Assuming field1 is temperature
-        st.plotly_chart(fig2, use_container_width=True)
+        with col1 :
+            st.subheader('Temperature over Time')
+            fig1 = px.line(data, x="Time", y="°C", title='Temperature', markers=True)  # Assuming field1 is temperature
+            st.plotly_chart(fig1, use_container_width=True)
+        
+        with col2 :
+            st.subheader('pH Level over Time')
+            fig2 = px.line(data, x="Time", y="pH", title='pH', markers=True)  # Assuming field1 is temperature
+            st.plotly_chart(fig2, use_container_width=True)
 
     with psyteam_tab:
         st.markdown("Taken from Psyteam's [website](https://psyteam-fc61f.web.app/)")
 
-        driver = get_driver()
-        driver.get("https://psyteam-fc61f.web.app/")
-        driver.implicitly_wait(7)
-        time.sleep(7)
+        if platform.system() == "Linux":
+            with st.spinner(text="Retrieving data..."):
+                driver = get_driver()
+                driver.get("https://psyteam-fc61f.web.app/")
+                driver.implicitly_wait(7)
+                time.sleep(7)
 
-        temperature_xpath = "/html/body/div/main/div[2]/div[2]/div[1]"
-        target_temperature = driver.find_element("xpath", temperature_xpath)
-        condition_xpath = "/html/body/div/main/div[2]/div[2]/div[2]"
-        target_condition = driver.find_element("xpath", condition_xpath)
-        # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
-        
-        col_t, col_c = st.columns(2)
-        col_t.metric(label=str(target_temperature.text).split("\n")[0], value=str(target_temperature.text).split("\n")[1])
-        col_c.metric(label=str(target_condition.text).split("\n")[0], value=str(target_condition.text).split("\n")[1])
-        style_metric_cards()
-        driver.quit()
+                temperature_xpath = "/html/body/div/main/div[2]/div[2]/div[1]"
+                target_temperature = driver.find_element("xpath", temperature_xpath)
+                condition_xpath = "/html/body/div/main/div[2]/div[2]/div[2]"
+                target_condition = driver.find_element("xpath", condition_xpath)
+                # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
+                
+                col_t, col_c = st.columns(2)
+                col_t.metric(label=str(target_temperature.text).split("\n")[0], value=str(target_temperature.text).split("\n")[1])
+                col_c.metric(label=str(target_condition.text).split("\n")[0], value=str(target_condition.text).split("\n")[1])
+                style_metric_cards()
+                driver.quit()
 
     with inkofarm_tab:
         st.markdown("Data provided by Inko Farm's team.")
@@ -122,15 +125,15 @@ with tab2:
         
         data = generate_data('2246150')
 
-    with col1 :
-        st.subheader('Temperature over Time')
-        fig1 = px.line(data, x="Time", y="°C", title='Temperature', markers=True)  # Assuming field1 is temperature
-        st.plotly_chart(fig1, use_container_width=True)
-    
-    with col2 :
-        st.subheader('pH Level over Time')
-        fig2 = px.line(data, x="Time", y="pH", title='pH', markers=True)  # Assuming field1 is temperature
-        st.plotly_chart(fig2, use_container_width=True)
+        with col1 :
+            st.subheader('Temperature over Time')
+            fig1 = px.line(data, x="Time", y="°C", title='Temperature', markers=True)  # Assuming field1 is temperature
+            st.plotly_chart(fig1, use_container_width=True)
+        
+        with col2 :
+            st.subheader('pH Level over Time')
+            fig2 = px.line(data, x="Time", y="pH", title='pH', markers=True)  # Assuming field1 is temperature
+            st.plotly_chart(fig2, use_container_width=True)
 
 with tab3:
         # Mock GPT-based API
