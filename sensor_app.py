@@ -60,7 +60,7 @@ with tab1:
 
 with tab2:
     st.write("Sensors provider:")
-    shadowfunk_tab, psyteam_tab, inkofarm_tab = st.tabs(["shadowfunk", "psyteam", "inko farm"])
+    shadowfunk_tab, psyteam_tab, inkofarm_tab, hihello_tab= st.tabs(["shadowfunk", "psyteam", "inko farm", "hihello"])
 
     def generate_data(id):
         THINGSPK_CHANNEL_ID = id
@@ -163,6 +163,34 @@ with tab2:
         #         col_c.metric(label="Current pH", value=str(target_ph.text))
         #         style_metric_cards()
         #         driver.quit()
+        
+    with hihello_tab:
+        st.markdown("Taken from Hihello's [website](https://hifish.serv00.net/)")
+
+        if platform.system() == "Linux":
+            with st.spinner(text="Retrieving data..."):
+                driver = get_driver()
+                driver.get("https://hifish.serv00.net/")
+                driver.implicitly_wait(3)
+                time.sleep(3)
+
+                def gettext(path):
+                    return str(driver.find_element("xpath", path).text)
+                
+                # temperature_xpath = "/html/body/div/main/div[2]/div[2]/div[1]"
+                # target_temperature = driver.find_element("xpath", temperature_xpath)
+                # condition_xpath = "/html/body/div/main/div[2]/div[2]/div[2]"
+                # target_condition = driver.find_element("xpath", condition_xpath)
+                temp_value = gettext(" /html/body/div[1]/div[2]/div[2]/div/div[2]/p")
+                ph_value = gettext("/html/body/div[1]/div[2]/div[1]/div/div[2]/p")
+                
+                # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
+                
+                col_t, col_ph = st.columns(2)
+                col_t.metric(label=temp_value.split()[0], value=str(temp_value.split()[1]))
+                col_ph.metric(label=ph_value.split()[0], value=str(ph_value.split()[1]))
+                style_metric_cards()
+                driver.quit()
 
 with tab3:
         # Mock GPT-based API
