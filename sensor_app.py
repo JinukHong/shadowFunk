@@ -24,6 +24,7 @@ def chatwrite(texttowrite):
         yield line + "\n"
         time.sleep(0.05)
 
+@st.cache_resource(ttl=300, show_spinner="Retrieving from cache...")
 def get_driver():
     random_user_agent = user_agent.random
     options = Options()
