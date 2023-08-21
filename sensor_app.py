@@ -196,9 +196,20 @@ with tab2:
 
                 if dfs:
                     df = dfs[0]
-                    st.write(df)
-                    fig_pH = px.line(df, x='Nilai pH Air', y="Waktu Kejadian", title='pH vs Date and Time')
-                    st.plotly_chart(fig_pH)
+                    # st.write(df)
+                    col1, col2 = st.columns(2)
+
+                    with col1:
+                        fig_temp = px.line(df, x="Waktu Kejadian", y='Nilai Temp (Celsius) Air', title='pH vs Date and Time')
+                        fig_temp.update_xaxes(title_text="Time")
+                        fig_temp.update_yaxes(title_text="°C")
+                        st.plotly_chart(fig_temp)
+                        
+                    with col2:
+                        fig_pH = px.line(df, x="Waktu Kejadian", y='Nilai pH Air', title='pH vs Date and Time')
+                        fig_pH.update_xaxes(title_text="Time")
+                        fig_pH.update_yaxes(title_text="pH")
+                        st.plotly_chart(fig_pH)
 
                 else:
                     st.write("No table data found")
