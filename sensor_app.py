@@ -222,9 +222,8 @@ with tab2:
                 if feed_dfs:
                     feed_df = feed_dfs[0]
                     st.write(feed_df)
-                    df_t = feed_df.transpose()
                     fig = px.scatter(
-                        df_t, 
+                        feed_df, 
                         x="Waktu Kejadian",
                         y='Status HiFish',
                         title='Machine Status Scatter Plot'
