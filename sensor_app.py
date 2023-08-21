@@ -103,7 +103,7 @@ with tab3:
     # chat_row = row([8,2])
     # user_message = chat_row.text_input("label", placeholder="Ketik disini, kemudian tekan tombol \"Tanya\"", label_visibility="collapsed")
     # input_button = chat_row.button("Tanya", use_container_width=True)
-    chat_row1, chat_row2 = st.columns([7,3])
+    chat_row1, chat_row2 = st.columns([3,7])
     with chat_row1:
         user_message = st.text_input("label", placeholder="Ketik disini, kemudian tekan tombol \"Tanya\"", label_visibility="collapsed")
     with chat_row2:
