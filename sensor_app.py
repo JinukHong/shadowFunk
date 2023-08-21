@@ -100,10 +100,14 @@ with tab3:
 
     # Chatbot interface
     st.caption("Tanya Seina tentang apapun:")
-    chat_row = row([8,2])
-    user_message = chat_row.text_input("label", placeholder="Ketik disini, kemudian tekan tombol \"Tanya\"", label_visibility="collapsed")
-    input_button = chat_row.button("Tanya", use_container_width=True)
-    
+    # chat_row = row([8,2])
+    # user_message = chat_row.text_input("label", placeholder="Ketik disini, kemudian tekan tombol \"Tanya\"", label_visibility="collapsed")
+    # input_button = chat_row.button("Tanya", use_container_width=True)
+    chat_row1, chat_row2 = st.columns([7,3])
+    with chat_row1:
+        user_message = st.text_input("label", placeholder="Ketik disini, kemudian tekan tombol \"Tanya\"", label_visibility="collapsed")
+    with chat_row2:
+       input_button = st.button("✅", use_container_width=True)    
 
     if not user_message:
         # DON'T FORGET TO UNCOMMENT THIS PART AFTER TESTING
