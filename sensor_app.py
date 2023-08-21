@@ -205,6 +205,11 @@ with tab2:
                         fig_temp = px.line(phtemp_df, x="Waktu Kejadian", y='Nilai Temp (Celcius) Air', title='pH vs Date and Time')
                         fig_temp.update_xaxes(title_text="Time", autorange='reversed')
                         fig_temp.update_yaxes(title_text="°C")
+                        
+                        fig_temp.update_xaxes(
+                            tickvals=fig_temp.data[0].x,
+                            ticktext=[time.strftime('%H:%M:%S') if i > 0 else time.strftime('%m/%d/%Y %H:%M:%S') for i, time in enumerate(fig_temp.data[0].x)]
+                        )
                         st.plotly_chart(fig_temp, use_container_width=True)
                         
                     with col2:
