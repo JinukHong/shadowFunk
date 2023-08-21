@@ -143,24 +143,24 @@ with tab2:
             fig2.update_yaxes(title_text="pH")
             st.plotly_chart(fig2, use_container_width=True)
 
-        if platform.system() == "Linux":
-            with st.spinner(text="Retrieving data..."):
-                driver = get_driver()
-                driver.get("https://thingspeak.com/channels/2246150/")
-                driver.implicitly_wait(7)
-                time.sleep(7)
+        # if platform.system() == "Linux":
+        #     with st.spinner(text="Retrieving data..."):
+        #         driver = get_driver()
+        #         driver.get("https://thingspeak.com/channels/2246150/")
+        #         driver.implicitly_wait(7)
+        #         time.sleep(7)
 
-                temperature_xpath = "/html/body/div/div[1]/svg/g/g/g/g[5]"
-                target_temperature = driver.find_element("xpath", temperature_xpath)
-                ph_xpath = "/html/body/div/div[1]/svg/g/g/g/g[5]"
-                target_ph= driver.find_element("xpath", ph_xpath)
-                # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
+        #         temperature_xpath = "/html/body/div/div[1]/svg/g/g/g/g[5]"
+        #         target_temperature = driver.find_element("xpath", temperature_xpath)
+        #         ph_xpath = "/html/body/div/div[1]/svg/g/g/g/g[5]"
+        #         target_ph= driver.find_element("xpath", ph_xpath)
+        #         # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
                 
-                col_t, col_c = st.columns(2)
-                col_t.metric(label="Current Temperature", value=str(target_temperature.text))
-                col_c.metric(label="Current pH", value=str(target_ph.text))
-                style_metric_cards()
-                driver.quit()
+        #         col_t, col_c = st.columns(2)
+        #         col_t.metric(label="Current Temperature", value=str(target_temperature.text))
+        #         col_c.metric(label="Current pH", value=str(target_ph.text))
+        #         style_metric_cards()
+        #         driver.quit()
 
 with tab3:
         # Mock GPT-based API
