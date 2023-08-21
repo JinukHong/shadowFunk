@@ -221,7 +221,7 @@ with tab2:
                     
                 if feed_dfs:
                     feed_df = feed_dfs[0]
-                    st.write(feed_df)
+                    # st.write(feed_df)
                     fig = px.scatter(
                         feed_df, 
                         x="Waktu Kejadian",
@@ -230,7 +230,7 @@ with tab2:
                     )
 
                     # Customize the x-axis label and layout
-                    fig.update_xaxes(title_text="Time", autorange='reversed')
+                    fig.update_xaxes(title_text="Time")
                     fig.update_layout(showlegend=False)
 
                     # Display the plot
