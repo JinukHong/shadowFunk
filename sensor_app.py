@@ -226,7 +226,7 @@ with tab2:
                     fig = px.scatter(
                         df_t, 
                         x="Waktu Kejadian",
-                        y=df_t['Status HiFish'], 
+                        y='Status HiFish',
                         title='Machine Status Scatter Plot'
                     )
 
