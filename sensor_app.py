@@ -96,12 +96,13 @@ with tab2:
         condition_xpath = "/html/body/div/main/div[2]/div[2]/div[2]"
         target_condition = driver.find_element("xpath", condition_xpath)
         # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
-        driver.quit()
-
+        
         col_t, col_c = st.columns(2)
         col_t.metric(label=str(target_temperature.text).split("\n")[0], value=str(target_temperature.text).split("\n")[1])
         col_c.metric(label=str(target_condition.text).split("\n")[0], value=str(target_condition.text).split("\n")[1])
         style_metric_cards()
+        driver.quit()
+
 
 
 with tab3:
