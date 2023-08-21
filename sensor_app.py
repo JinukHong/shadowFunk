@@ -24,6 +24,7 @@ def chatwrite(texttowrite):
         yield line + "\n"
         time.sleep(0.05)
 
+@st.cache_resource(allow_output_mutation=True)
 def get_driver():
     random_user_agent = user_agent.random
     options = Options()
@@ -121,7 +122,7 @@ with tab2:
                 driver.quit()
 
     with inkofarm_tab:
-        st.markdown("Data provided by Inko Farm's team.")
+        st.markdown("Data provided by Inko Farm's [dataset](https://thingspeak.com/channels/2246150).")
 
         col1,col2 = st.columns([1,1])
 
@@ -143,6 +144,25 @@ with tab2:
             fig2.update_yaxes(title_text="pH")
             st.plotly_chart(fig2, use_container_width=True)
 
+        if platform.system() == "Linux":
+            with st.spinner(text="Retrieving data..."):
+                driver = get_driver()
+                driver.get("https://thingspeak.com/channels/2246150/")
+                driver.implicitly_wait(7)
+                time.sleep(7)
+
+                temperature_xpath = "/html/body/div/div[1]/svg/g/g/g/g[5]/text"
+                target_temperature = driver.find_element("xpath", temperature_xpath)
+                ph_xpath = "/html/body/div/div[1]/svg/g/g/g/g[5]/text"
+                target_ph= driver.find_element("xpath", ph_xpath)
+                # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
+                
+                col_t, col_c = st.columns(2)
+                col_t.metric(label="Current Temperature", value=str(target_temperature.text))
+                col_c.metric(label="Current pH", value=str(target_ph.text))
+                style_metric_cards()
+                driver.quit()
+                
 with tab3:
         # Mock GPT-based API
     def get_gpt_response(message, context):
