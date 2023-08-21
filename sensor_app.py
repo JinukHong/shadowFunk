@@ -102,7 +102,7 @@ with tab3:
     st.caption("Tanya Seina tentang apapun:")
     chat_row = row([8,2])
     user_message = chat_row.text_input("label", placeholder="Ketik disini, kemudian tekan tombol \"Tanya\"", label_visibility="collapsed")
-    input_button = chat_row.button("Tanya")
+    input_button = chat_row.button("Tanya", use_container_width=True)
     
 
     if not user_message:
