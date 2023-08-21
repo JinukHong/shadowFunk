@@ -222,6 +222,21 @@ with tab2:
                 if feed_dfs:
                     feed_df = feed_dfs[0]
                     st.write(feed_df)
+                    all_statuses = set(feed_df.loc['Status HiFish'])
+                    df_t = feed_df.transpose()
+                    fig = px.scatter(
+                        df_t, 
+                        x=df_t.index, 
+                        y=df_t['status'], 
+                        title='Machine Status Scatter Plot'
+                    )
+
+                    # Customize the x-axis label and layout
+                    fig.update_xaxes(title_text="Time")
+                    fig.update_layout(showlegend=False)
+
+                    # Display the plot
+                    st.plotly_chart(fig)
                 else:
                     st.write("No table data found")
                     
