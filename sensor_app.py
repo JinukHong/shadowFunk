@@ -205,13 +205,13 @@ with tab2:
                         fig_temp = px.line(phtemp_df, x="Waktu Kejadian", y='Nilai Temp (Celcius) Air', title='pH vs Date and Time')
                         fig_temp.update_xaxes(title_text="Time", autorange='reversed')
                         fig_temp.update_yaxes(title_text="°C")
-                        st.plotly_chart(fig_temp)
+                        st.plotly_chart(fig_temp, use_container_width=True)
                         
                     with col2:
                         fig_pH = px.line(phtemp_df, x="Waktu Kejadian", y='Nilai pH Air', title='pH vs Date and Time')
                         fig_pH.update_xaxes(title_text="Time", autorange='reversed')
                         fig_pH.update_yaxes(title_text="pH")
-                        st.plotly_chart(fig_pH)
+                        st.plotly_chart(fig_pH, use_container_width=True)
 
                 else:
                     st.write("No table data found")
@@ -220,8 +220,8 @@ with tab2:
                 feed_dfs = pd.read_html(feed_html)
                     
                 if feed_dfs:
-                    phtemp_df = phtemp_dfs[0]
-                    st.write(phtemp_df)
+                    feed_df = feed_dfs[0]
+                    st.write(feed_dfs)
                 else:
                     st.write("No table data found")
                     
