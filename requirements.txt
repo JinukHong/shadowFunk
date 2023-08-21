@@ -1,5 +1,8 @@
 streamlit
 streamlit-extras
+seleniumbase
+webdriver-manager
+lxml
 deep_translator
 numpy
 pandas

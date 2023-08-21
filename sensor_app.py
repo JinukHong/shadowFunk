@@ -4,16 +4,29 @@ import numpy as np
 import datetime
 import collections
 import openai
-import time
 from streamlit_extras.streaming_write import write
 from streamlit_extras.row import row
+from streamlit_extras.metric_cards import style_metric_cards
 from deep_translator import GoogleTranslator
+import time
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 def chatwrite(texttowrite):
     lines = texttowrite.split('\n')
     for line in lines:
         yield line + "\n"
         time.sleep(0.05)
+
+def get_driver():
+    options = Options()
+    options.add_argument('--disable-gpu')
+    options.add_argument('--headless')
+    x = ChromeDriverManager(driver_version="116.0.5845.96").install()
+    service = Service(x)
+    return webdriver.Chrome(service=service, options=options)
 
 st.set_page_config(page_title="Seinfarm in Your Hand",
                    page_icon="👨‍🌾",
@@ -36,31 +49,51 @@ with tab1:
     col1.write(towriteincol1)
     # col2.image("https://buruansae.bandung.go.id/wp-content/uploads/2020/09/WhatsApp-Image-2020-09-19-at-16.34.00-770x428.jpeg")
     col2.image("https://buruansae.bandung.go.id/wp-content/uploads/2021/12/Sein-Farm-2048x819.png")
+
 with tab2:
-    st.write('Displaying dummy data for temperature and pH levels.')
+    steamfunk_tab, psyteam_tab = st.tabs(["pH", "Temperature"])
+    with steamfunk_tab:
+        st.write('Displaying dummy data for temperature and pH levels.')
 
-    col1,col2 = st.columns([1,1])
+        col1,col2 = st.columns([1,1])
 
-    # Generate dummy data
-    def generate_data():
-        time_range = pd.date_range(start="now", periods=60, freq="T")  # Every minute for an hour
-        temperature = np.random.uniform(20, 30, 60)  # Random temperature values between 20 and 30
-        pH = np.random.uniform(6.5, 7.5, 60)  # Random pH values between 6.5 and 7.5
-        return pd.DataFrame({
-            "Time": time_range,
-            "Temperature": temperature,
-            "pH": pH
-        })
-    data = generate_data()
+        # Generate dummy data
+        def generate_data():
+            time_range = pd.date_range(start="now", periods=60, freq="T")  # Every minute for an hour
+            temperature = np.random.uniform(20, 30, 60)  # Random temperature values between 20 and 30
+            pH = np.random.uniform(6.5, 7.5, 60)  # Random pH values between 6.5 and 7.5
+            return pd.DataFrame({
+                "Time": time_range,
+                "Temperature": temperature,
+                "pH": pH
+            })
+        data = generate_data()
 
-    with col1 :
-        st.subheader('Temperature over Time')
-        st.line_chart(data.set_index('Time')['Temperature'])
+        with col1 :
+            st.subheader('Temperature over Time')
+            st.line_chart(data.set_index('Time')['Temperature'])
+        
+        with col2 :
+            st.subheader('pH Level over Time')
+            st.line_chart(data.set_index('Time')['pH'])
 
-    
-    with col2 :
-        st.subheader('pH Level over Time')
-        st.line_chart(data.set_index('Time')['pH'])
+    with psyteam_tab:
+        st.markdown("Taken from Psyteam's [website](https://psyteam-fc61f.web.app/)")
+
+        driver = get_driver()
+        driver.get("https://psyteam-fc61f.web.app/")
+        driver.implicitly_wait(7)
+        time.sleep(7)
+
+        temperature_xpath = "/html/body/div/main/div[2]/div[2]/div[1]"
+        target_temperature = driver.find_element("xpath", temperature_xpath)
+        condition_xpath = "/html/body/div/main/div[2]/div[2]/div[2]"
+        target_condition = driver.find_element("xpath", condition_xpath)
+        # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
+
+        col_t, col_c = st.columns[1,1]
+        col_t.metric(label=str(target_temperature.text).split("\n")[0], value=str(target_temperature.text).split("\n")[1])
+        col_c.metric(label=str(target_condition.text).split("\n")[0], value=str(target_condition.text).split("\n")[1])
 
 with tab3:
         # Mock GPT-based API
@@ -100,14 +133,9 @@ with tab3:
 
     # Chatbot interface
     st.caption("Tanya Seina tentang apapun:")
-    # chat_row = row([8,2])
-    # user_message = chat_row.text_input("label", placeholder="Ketik disini, kemudian tekan tombol \"Tanya\"", label_visibility="collapsed")
-    # input_button = chat_row.button("Tanya", use_container_width=True)
-    chat_row1, chat_row2 = st.columns([3,7])
-    with chat_row1:
-        user_message = st.text_input("label", placeholder="Ketik disini, kemudian tekan tombol \"Tanya\"", label_visibility="collapsed")
-    with chat_row2:
-       input_button = st.button("✅", use_container_width=True)    
+    chat_row = row([9,1])
+    user_message = chat_row.text_input("label", placeholder="Ketik disini, kemudian tekan tombol \"Tanya\"", label_visibility="collapsed")
+    input_button = chat_row.button("Tanya", use_container_width=True)
 
     if not user_message:
         # DON'T FORGET TO UNCOMMENT THIS PART AFTER TESTING
