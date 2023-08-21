@@ -1,1 +1,1 @@
-chromium=116.0.5845.96-2
+chromium
