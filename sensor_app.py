@@ -221,7 +221,7 @@ with tab2:
                     
                 if feed_dfs:
                     feed_df = feed_dfs[0]
-                    st.write(feed_dfs)
+                    st.write(feed_df)
                 else:
                     st.write("No table data found")
                     
