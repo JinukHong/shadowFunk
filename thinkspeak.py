@@ -4,7 +4,7 @@ import streamlit as st
 import plotly.express as px
 
 
-THINGSPK_CHANNEL_ID = '2246162'
+THINGSPK_CHANNEL_ID = '2246162' #2246150'#
 THINGSPK_API_READ_KEY = 'W5552EETGI8TGQJW'
 URL = f'https://api.thingspeak.com/channels/{THINGSPK_CHANNEL_ID}/feeds.json?api_key={THINGSPK_API_READ_KEY}'
 #https://api.thingspeak.com/channels/2246162/feeds.json?api_key=W5552EETGI8TGQJW

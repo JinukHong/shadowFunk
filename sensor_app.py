@@ -6,6 +6,10 @@ import collections
 import openai
 import requests
 import plotly.express as px
+from prophet import Prophet
+import plotly.graph_objects as go
+
+
 
 openai.api_key = st.secrets["secrets"]['OPENAI_API_KEY']
 
@@ -32,23 +36,67 @@ with tab2:
 
         df_sensors = pd.DataFrame(data['feeds'])
         df_sensors = df_sensors.astype({'field1':'float'})
-        df_sensors = df_sensors.astype({'field2':'float'})
-
+        df_sensors = df_sensors.astype({'field2':'float'})  
+        df_sensors.rename(columns={'created_at':'DateTime','field1':'Temperature','field2':'PH'}, inplace=True)
+        df_sensors['DateTime'] = pd.to_datetime(df_sensors['DateTime'])
 
         return df_sensors
+    
+    def forecast_data(df, column_name):
+        # Prepare data for Prophet
+        df_prophet = df[['DateTime', column_name]].copy()  # Use .copy() to avoid modifying the original df
+        df_prophet['DateTime'] = df_prophet['DateTime'].dt.tz_localize(None)  # Remove timezone
+        df_prophet = df_prophet.rename(columns={'DateTime': 'ds', column_name: 'y'})
+
+        # Initialize and fit the model
+        model = Prophet(yearly_seasonality=True, daily_seasonality=True)
+        model.fit(df_prophet)
+
+        # Create a dataframe for future dates (e.g., 7 days into the future)
+        future = model.make_future_dataframe(periods=7)
+
+        # Forecast values
+        forecast = model.predict(future)
+        
+        return forecast
+
+
 
     data = generate_data()
+    st.write(data)
+    # Forecast temperature
+    forecast_temperature = forecast_data(data, 'Temperature')
+    # Forecast pH
+    forecast_pH = forecast_data(data, 'PH')
+
 
     with col1 :
-        st.subheader('Temperature over Time')
-        fig1 = px.line(data, x="created_at", y="field1", title='Temperature', markers=True)  # Assuming field1 is temperature
-        st.plotly_chart(fig1, use_container_width=True)
+        # st.subheader('Temperature over Time')
+        # fig1 = px.line(data, x="created_at", y="field1", title='Temperature', markers=True)  # Assuming field1 is temperature
+        # st.plotly_chart(fig1, use_container_width=True)
+        st.markdown('### Temperature and Forecast')
+        last_real_data_date = data["DateTime"].max()
+        last_forecast_date = forecast_temperature['ds'].max()
+        fig_temp = go.Figure()
+        fig_temp.add_trace(go.Scatter(x=data["DateTime"], y=data["temperature"], mode='lines+markers', name='Actual'))
+        fig_temp.add_trace(go.Scatter(x=forecast_temperature['ds'], y=forecast_temperature['yhat'], mode='lines', name='Forecast'))
+        fig_temp.update_layout(xaxis_range=[last_real_data_date - pd.Timedelta(days=1), last_forecast_date + pd.Timedelta(days=1)])
+        st.plotly_chart(fig_temp, use_container_width=True)
+
 
     
     with col2 :
-        st.subheader('pH Level over Time')
-        fig2 = px.line(data, x="created_at", y="field2", title='PH', markers=True)  # Assuming field1 is temperature
-        st.plotly_chart(fig2, use_container_width=True)
+        # st.subheader('pH Level over Time')
+        # fig2 = px.line(data, x="created_at", y="field2", title='PH', markers=True)  # Assuming field1 is temperature
+        # st.plotly_chart(fig2, use_container_width=True)
+        st.markdown('### pH Level and Forecast')
+        last_forecast_date = forecast_temperature['ds'].max()
+        fig_temp = go.Figure()
+        fig_temp.add_trace(go.Scatter(x=data["DateTime"], y=data["PH"], mode='lines+markers', name='Actual'))
+        fig_temp.add_trace(go.Scatter(x=forecast_temperature['ds'], y=forecast_temperature['yhat'], mode='lines', name='Forecast'))
+        fig_temp.update_layout(xaxis_range=[last_real_data_date - pd.Timedelta(days=1), last_forecast_date + pd.Timedelta(days=1)])
+        st.plotly_chart(fig_temp, use_container_width=True)
+
 
 
 with tab3:
