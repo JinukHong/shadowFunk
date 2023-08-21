@@ -58,33 +58,35 @@ with tab1:
     col2.image("https://buruansae.bandung.go.id/wp-content/uploads/2021/12/Sein-Farm-2048x819.png")
 
 with tab2:
-    steamfunk_tab, psyteam_tab = st.tabs(["pH", "Temperature"])
-    with steamfunk_tab:
+    st.write("Sensors provider:")
+    shadowfunk_tab, psyteam_tab, inkofarm_tab = st.tabs(["shadowfunk", "psyteam", "inko farm"])
+
+    def generate_data(id):
+        THINGSPK_CHANNEL_ID = id
+        THINGSPK_API_READ_KEY = 'W5552EETGI8TGQJW'
+        URL = f'https://api.thingspeak.com/channels/{THINGSPK_CHANNEL_ID}/feeds.json?api_key={THINGSPK_API_READ_KEY}'
+        response = requests.get(URL)
+        data = response.json()
+
+        df_sensors = pd.DataFrame(data['feeds'])
+        df_sensors = df_sensors.astype({'field1':'float'})
+        df_sensors = df_sensors.astype({'field2':'float'})
+
+        return df_sensors
+    
+    with shadowfunk_tab:
         st.write('Data provided by ShadowFunk team.')
 
         col1,col2 = st.columns([1,1])
 
         # Generate dummy data
-        def generate_data():
-            THINGSPK_CHANNEL_ID = '2246162'
-            THINGSPK_API_READ_KEY = 'W5552EETGI8TGQJW'
-            URL = f'https://api.thingspeak.com/channels/{THINGSPK_CHANNEL_ID}/feeds.json?api_key={THINGSPK_API_READ_KEY}'
-            response = requests.get(URL)
-            data = response.json()
-
-            df_sensors = pd.DataFrame(data['feeds'])
-            df_sensors = df_sensors.astype({'field1':'float'})
-            df_sensors = df_sensors.astype({'field2':'float'})
-
-            return df_sensors
         
-        data = generate_data()
+        data = generate_data('2246162')
 
     with col1 :
         st.subheader('Temperature over Time')
         fig1 = px.line(data, x="Time", y="°C", title='Temperature', markers=True)  # Assuming field1 is temperature
         st.plotly_chart(fig1, use_container_width=True)
-
     
     with col2 :
         st.subheader('pH Level over Time')
@@ -111,7 +113,24 @@ with tab2:
         style_metric_cards()
         driver.quit()
 
+    with inkofarm_tab:
+        st.markdown("Data provided by Inko Farm's team.")
 
+        col1,col2 = st.columns([1,1])
+
+        # Generate dummy data
+        
+        data = generate_data('2246150')
+
+    with col1 :
+        st.subheader('Temperature over Time')
+        fig1 = px.line(data, x="Time", y="°C", title='Temperature', markers=True)  # Assuming field1 is temperature
+        st.plotly_chart(fig1, use_container_width=True)
+    
+    with col2 :
+        st.subheader('pH Level over Time')
+        fig2 = px.line(data, x="Time", y="pH", title='pH', markers=True)  # Assuming field1 is temperature
+        st.plotly_chart(fig2, use_container_width=True)
 
 with tab3:
         # Mock GPT-based API
