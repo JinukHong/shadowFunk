@@ -91,10 +91,11 @@ with tab2:
         target_condition = driver.find_element("xpath", condition_xpath)
         # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
 
-        col_t, col_c = st.columns[1,1]
+        col_t, col_c = st.columns(2)
         col_t.metric(label=str(target_temperature.text).split("\n")[0], value=str(target_temperature.text).split("\n")[1])
         col_c.metric(label=str(target_condition.text).split("\n")[0], value=str(target_condition.text).split("\n")[1])
-
+        style_metric_cards()
+        
 with tab3:
         # Mock GPT-based API
     def get_gpt_response(message, context):
