@@ -150,9 +150,9 @@ with tab2:
                 driver.implicitly_wait(7)
                 time.sleep(7)
 
-                temperature_xpath = "/html/body/div/div[1]/svg/g/g/g/g[5]/text"
+                temperature_xpath = "/html/body/div/div[1]/svg/g/g/g/g[5]"
                 target_temperature = driver.find_element("xpath", temperature_xpath)
-                ph_xpath = "/html/body/div/div[1]/svg/g/g/g/g[5]/text"
+                ph_xpath = "/html/body/div/div[1]/svg/g/g/g/g[5]"
                 target_ph= driver.find_element("xpath", ph_xpath)
                 # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
                 
