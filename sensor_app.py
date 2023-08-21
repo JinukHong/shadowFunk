@@ -206,9 +206,13 @@ with tab2:
                         fig_temp.update_xaxes(title_text="Time", autorange='reversed')
                         fig_temp.update_yaxes(title_text="°C")
                         
+                        datetime_objects = [datetime.strptime(time, '%Y-%m-%d %H:%M') for time in fig_temp.data[0].x]
+
+                        # Format x-axis tick labels
+                        ticktext = [time.strftime('%H:%M:%S') if i > 0 else time.strftime('%m/%d/%Y %H:%M:%S') for i, time in enumerate(datetime_objects)]
                         fig_temp.update_xaxes(
                             tickvals=fig_temp.data[0].x,
-                            ticktext=[time.strftime('%H:%M:%S') if i > 0 else time.strftime('%m/%d/%Y %H:%M:%S') for i, time in enumerate(fig_temp.data[0].x)]
+                            ticktext=ticktext
                         )
                         st.plotly_chart(fig_temp, use_container_width=True)
                         
