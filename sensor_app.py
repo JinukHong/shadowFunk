@@ -183,7 +183,9 @@ with tab2:
                 # target_condition = driver.find_element("xpath", condition_xpath)
                 temp_value = gettext(" /html/body/div[1]/div[2]/div[2]/div/div[2]/p")
                 ph_value = gettext("/html/body/div[1]/div[2]/div[1]/div/div[2]/p")
-                tabletest = driver.find_element("xpath", "/html/body/div[2]/div/div[2]/table")
+                phtemptable = driver.find_element("xpath", "/html/body/div[2]/div/div[2]/table")
+                feedtable = driver.find_element("xpath", "/html/body/div[2]/div/div[1]/table")
+                
                 # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
                 
                 col_t, col_ph = st.columns(2)
@@ -191,28 +193,38 @@ with tab2:
                 col_ph.metric(label=ph_value.split()[0], value=str(ph_value.split()[1]))
                 style_metric_cards()
                 
-                table_html = tabletest.get_attribute('outerHTML')
-                dfs = pd.read_html(table_html)
+                phtemp_html = feedtable.get_attribute('outerHTML')
+                phtemp_dfs = pd.read_html(phtemp_html)
 
-                if dfs:
-                    df = dfs[0]
+                if phtemp_dfs:
+                    phtemp_df = phtemp_dfs[0]
                     # st.write(df)
                     col1, col2 = st.columns(2)
 
                     with col1:
-                        fig_temp = px.line(df, x="Waktu Kejadian", y='Nilai Temp (Celcius) Air', title='pH vs Date and Time')
-                        fig_temp.update_xaxes(title_text="Time")
+                        fig_temp = px.line(phtemp_df, x="Waktu Kejadian", y='Nilai Temp (Celcius) Air', title='pH vs Date and Time')
+                        fig_temp.update_xaxes(title_text="Time", autorange='reversed')
                         fig_temp.update_yaxes(title_text="°C")
                         st.plotly_chart(fig_temp)
                         
                     with col2:
-                        fig_pH = px.line(df, x="Waktu Kejadian", y='Nilai pH Air', title='pH vs Date and Time')
-                        fig_pH.update_xaxes(title_text="Time")
+                        fig_pH = px.line(phtemp_df, x="Waktu Kejadian", y='Nilai pH Air', title='pH vs Date and Time')
+                        fig_pH.update_xaxes(title_text="Time", autorange='reversed')
                         fig_pH.update_yaxes(title_text="pH")
                         st.plotly_chart(fig_pH)
 
                 else:
                     st.write("No table data found")
+
+                feed_html = feedtable.get_attribute('outerHTML')
+                feed_dfs = pd.read_html(feed_html)
+                    
+                if feed_dfs:
+                    phtemp_df = phtemp_dfs[0]
+                    st.write(phtemp_df)
+                else:
+                    st.write("No table data found")
+                    
                 driver.quit()
 
 with tab3:
