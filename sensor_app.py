@@ -7,6 +7,8 @@ import openai
 from streamlit_extras.streaming_write import write
 from streamlit_extras.row import row
 from streamlit_extras.metric_cards import style_metric_cards
+from streamlit_extras.mention import mention
+from streamlit_player import st_player
 from deep_translator import GoogleTranslator
 import time
 from selenium import webdriver
@@ -76,13 +78,48 @@ with tab1:
 
     st.subheader('About Sein Farm')
     col1, col2 = st.columns([1,1])
-    towriteincol1 = "Sein Farm atau Sekelama Integrated Farming adalah salah satu merk inovasi pertanian terpadu di Kota Bandung yang menggabungkan "\
-        "unsur – unsur pertanian, peternakan dan perikanan. Sekelama sendiri diambil dari nama jalan dimana SEIN FARM berada yaitu di Jalan Sekemala"\
-        " kelurahan Pasanggrahan, Kecamatan Ujungberung, Kota Bandung. Daerah ini merupakan daerah terluar dari Kota Bandung yang terdapat sawah abadi "\
-        "milik PEMKOT Bandung."
-    col1.write(towriteincol1)
+    towriteincol1 = "**Sein Farm** atau **Sekelama Integrated Farming** adalah salah satu merk inovasi pertanian terpadu di Kota Bandung yang menggabungkan "\
+        "unsur – unsur pertanian, peternakan dan perikanan. Sekelama sendiri diambil dari nama jalan dimana Sein Farm berada yaitu di Jalan Sekemala,"\
+        " Kelurahan Pasanggrahan, Kecamatan Ujungberung, Kota Bandung. Daerah ini merupakan daerah terluar dari Kota Bandung yang terdapat sawah abadi "\
+        "milik Pemkot Bandung. Sein Farm dimaksudkan untuk optimalisasi lahan yaitu menjaga status lahan pertanian, penyediaan pangan, kepedulian hidup "\
+        "dan pertanian berkelanjutan."
+    col1.markdown(towriteincol1)
     # col2.image("https://buruansae.bandung.go.id/wp-content/uploads/2020/09/WhatsApp-Image-2020-09-19-at-16.34.00-770x428.jpeg")
     col2.image("https://buruansae.bandung.go.id/wp-content/uploads/2021/12/Sein-Farm-2048x819.png")
+
+    mention(
+        label="Baca Selengkapnya",
+        icon="📖",
+        url="https://buruansae.bandung.go.id/index.php/tag/sein-farm/",
+    )
+
+    with st.expander("📽️Tonton Video"):
+        col1, col2 = st.columns(2)
+        with col1:
+            st_player("https://www.youtube.com/watch?v=zeITiv8Dt0A", light=True, playing=True)
+            st_player("https://www.youtube.com/watch?v=Nl5I5trYKnw", light=True, playing=True)
+        with col2:
+            st_player("https://www.youtube.com/watch?v=la93X4uoXuw", light=True, playing=True)
+            st_player("https://www.youtube.com/watch?v=wHaTpEOUOq8", light=True, playing=True)
+            
+    google_map_html = """
+        https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.8752298774416!2d107.71661211431697!3d-6.90552036949942!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68dda940094b3f%3A0x339ec5e7ed736051!2sSEIN%20FARM!5e0!3m2!1sen!2sid!4v1640677700472!5m2!1sen!2sid
+        """
+
+    # Embed the Google Map HTML in the Streamlit app
+    st.components.v1.iframe(google_map_html, height=300)
+    
+    # import folium
+    # from streamlit_folium import st_folium
+
+    # m = folium.Map(location=[-6.907438,107.715438], zoom_start=16)
+    # folium.Marker(
+    #     [-6.907438,107.715438], popup="Sein Farm", tooltip="Sein Farm"
+    # ).add_to(m)
+
+    # # call to render Folium map in Streamlit, but don't get any data back
+    # # from the map (so that it won't rerun the app when the user interacts)
+    # st_folium(m, width=400, height=400, returned_objects=[])
 
 with tab2:
     st.write("Sensors provider:")
@@ -295,13 +332,13 @@ with tab3:
 
     # User's message
 
-    seina_message = "Mulai dari sekarang, kamu akan berperan sebagai Seina, bot serba tau yang periang, ekspresif, dan ramah. Seina akan menjawab semua pertanyaan seputar Sein Farm "\
+    seina_message = "Mulai dari sekarang, kamu akan berperan sebagai Seina, gadis serba tau yang periang, ekspresif, dan ramah. Seina akan menjawab semua pertanyaan seputar Sein Farm "\
     "yang terletak di Pasanggrahan, Kecamatan Ujungberung, Kota Bandung," \
     "dan fakta fakta seputar pertanian dan peternakan ikan. Kamu akan menyapa dengan \"Hai👋, aku Seina, terimakasih sudah bertanya😊\"" \
     ", dan kemudian kamu akan menjawab pertanyaan berikut: "
 
     ending_message = """
-    (Ingat, hindari misinformasi. Bila ragu, minta maaf dan jangan lanjutkan menjawab.).
+    (Meskipun pertanyaannya berbahasa Inggris, jawablah dengan bahasa Indonesia. Ingat, hindari misinformasi. Bila ragu, minta maaf dan jangan lanjutkan menjawab.).
     """
     prompt = seina_message + user_message + ending_message
     # Response from the API
@@ -328,36 +365,14 @@ with tab3:
 hide_footer_style = """
 <style>
 #MainMenu {visibility: hidden;} 
-div.block-container {padding-top:2rem;}
+div.block-container {padding-top:1rem;}
+div.block-container {padding-bottom:3rem;}
 }
 </style>
 """
 st.markdown(hide_footer_style, unsafe_allow_html=True)
 
 footer_setup = '''
-<style>
-/* Style for the footer */
-.footer-content {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 5px;
-}
-
-.footer-text {
-    margin-right: auto;
-}
-
-.footer-logos {
-    display: flex;
-    align-items: center;
-}
-</style>
-
 <script>
 // To break out of iframe and access the parent window
 const streamlitDoc = window.parent.document;
@@ -366,17 +381,11 @@ const streamlitDoc = window.parent.document;
 document.addEventListener("DOMContentLoaded", function(event){
     const footer = streamlitDoc.getElementsByTagName("footer")[0];
     footer.innerHTML = `
-        <div class="footer-content">
-            <div class="footer-text">
-                Provided by 
-                <a href="https://windboy.pusan.ac.kr/issue/issueView?idx=863#solution3282" target="_blank" class="css-z3au9t egzxvld2">shadowfunk</a>
-            </div>
-            <div class="footer-logos">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/9/9f/Flag_of_Indonesia.svg" alt="Indonesian Flag" height="30">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/0/0f/Flag_of_South_Korea.png" alt="Korean Flag" height="30">
-                <img src="https://windboy.pusan.ac.kr/assets/files/group/csnsp2.png" alt="Creativity Station Logo" height="30">
-            </div>
-        </div>
+        Provided by 
+        <a href="https://windboy.pusan.ac.kr/issue/issueView?idx=863#solution3282" target="_blank" class="css-z3au9t egzxvld2">shadowfunk</a>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/9/9f/Flag_of_Indonesia.svg" alt="Indonesian Flag" height="30">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/0f/Flag_of_South_Korea.png" alt="Korean Flag" height="30">
+        <img src="https://windboy.pusan.ac.kr/assets/files/group/csnsp2.png" alt="Creativity Station Logo" height="30">
     `;
 });
 </script>

@@ -1,5 +1,6 @@
 streamlit==1.25.0
 streamlit-extras==0.3.0
+streamlit-player==0.1.5
 seleniumbase==4.17.8
 webdriver-manager==4.0.0
 lxml==4.9.3
