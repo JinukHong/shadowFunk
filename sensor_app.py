@@ -42,6 +42,7 @@ st.set_page_config(page_title="Seinfarm in Your Hand",
                    )
 
 openai.api_key = st.secrets["secrets"]['OPENAI_API_KEY']
+thingerauth = st.secrets["secrets"]['THINGER_AUTH']
 
 st.title('Sein Farm in your hand')
 tab1, tab2, tab3= st.tabs(['Beranda' , 'Statistik', 'Tanya Seina'])
@@ -60,7 +61,7 @@ with tab1:
 
 with tab2:
     st.write("Sensors provider:")
-    shadowfunk_tab, psyteam_tab, inkofarm_tab, hihello_tab= st.tabs(["shadowfunk", "psyteam", "inko farm", "hihello"])
+    shadowfunk_tab, psyteam_tab, inkofarm_tab, hihello_tab, ie_tab = st.tabs(["shadowfunk", "psyteam", "inko farm", "hihello", "IE"])
 
     def generate_data(id):
         THINGSPK_CHANNEL_ID = id
@@ -177,11 +178,7 @@ with tab2:
                 def gettext(path):
                     return str(driver.find_element("xpath", path).text)
                 
-                # temperature_xpath = "/html/body/div/main/div[2]/div[2]/div[1]"
-                # target_temperature = driver.find_element("xpath", temperature_xpath)
-                # condition_xpath = "/html/body/div/main/div[2]/div[2]/div[2]"
-                # target_condition = driver.find_element("xpath", condition_xpath)
-                temp_value = gettext(" /html/body/div[1]/div[2]/div[2]/div/div[2]/p")
+                temp_value = gettext("/html/body/div[1]/div[2]/div[2]/div/div[2]/p")
                 ph_value = gettext("/html/body/div[1]/div[2]/div[1]/div/div[2]/p")
                 phtemptable = driver.find_element("xpath", "/html/body/div[2]/div/div[2]/table")
                 feedtable = driver.find_element("xpath", "/html/body/div[2]/div/div[1]/table")
@@ -238,6 +235,32 @@ with tab2:
                 else:
                     st.write("No table data found")
                     
+                driver.quit()
+
+    with ie_tab:
+        st.markdown("Taken from ie's Thinger dashboard")
+
+        if platform.system() == "Linux":
+            with st.spinner(text="Retrieving data..."):
+                driver = get_driver()
+                driver.get(f"https://console.thinger.io/dashboards/ESP32?authorization={thingerauth}")
+                driver.implicitly_wait(5)
+                time.sleep(5)
+
+                def gettext(path):
+                    return str(driver.find_element("xpath", path).text)
+                
+                temp_value = gettext("/html/body/ui-view/div/div[1]/div[2]/dashboard/div/div[3]/div/div/div/div/ul/li[2]/div/div[2]/div/div/div/donutchart-widget/div/div/span")
+                nh3_value = gettext("/html/body/ui-view/div/div[1]/div[2]/dashboard/div/div[3]/div/div/div/div/ul/li[3]/div/div[2]/div/div/div/donutchart-widget/div/div/span")
+                ph_value = gettext("/html/body/ui-view/div/div[1]/div[2]/dashboard/div/div[3]/div/div/div/div/ul/li[4]/div/div[2]/div/div/div/donutchart-widget/div/div/span")
+                
+                # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
+                
+                col_t, col_nh3, col_ph = st.columns(3)
+                col_t.metric(label="Temperature", value=str(temp_value))
+                col_nh3.metric(label="Ammonia", value=str(nh3_value))
+                col_ph.metric(label="pH", value=str(ph_value))
+                style_metric_cards()
                 driver.quit()
 
 with tab3:
