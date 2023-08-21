@@ -24,7 +24,7 @@ def chatwrite(texttowrite):
         yield line + "\n"
         time.sleep(0.05)
 
-@st.cache_resource(allow_output_mutation=True)
+@st.cache_resource()
 def get_driver():
     random_user_agent = user_agent.random
     options = Options()
@@ -162,7 +162,7 @@ with tab2:
                 col_c.metric(label="Current pH", value=str(target_ph.text))
                 style_metric_cards()
                 driver.quit()
-                
+
 with tab3:
         # Mock GPT-based API
     def get_gpt_response(message, context):
