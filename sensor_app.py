@@ -135,6 +135,7 @@ with tab2:
             fig1.update_xaxes(title_text="Time")
             fig1.update_yaxes(title_text="°C")
             st.plotly_chart(fig1, use_container_width=True)
+            st.components.v1.iframe("https://thingspeak.com/channels/2246150/widgets/698516", height=400)
 
         with col2 :
             st.subheader('pH Level over Time')
@@ -142,6 +143,7 @@ with tab2:
             fig2.update_xaxes(title_text="Time")
             fig2.update_yaxes(title_text="pH")
             st.plotly_chart(fig2, use_container_width=True)
+            st.components.v1.iframe("https://thingspeak.com/channels/2246150/widgets/698517", height=400)
 
         # if platform.system() == "Linux":
         #     with st.spinner(text="Retrieving data..."):
