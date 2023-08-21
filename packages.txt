@@ -1,1 +1,1 @@
-chromium
+chromium=116.0.5845.96-1~deb11u1

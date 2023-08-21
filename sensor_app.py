@@ -24,8 +24,8 @@ def chatwrite(texttowrite):
         yield line + "\n"
         time.sleep(0.05)
 
-@st.cache_resource(ttl=300, show_spinner="Retrieving from cache...")
-def get_driver():
+@st.cache_data(ttl=300, show_spinner="Retrieving from cache...")
+def get_driver(link, wait, firstxpath=None, secondxpath=None):
     random_user_agent = user_agent.random
     options = Options()
     options.add_argument('--disable-gpu')
@@ -33,7 +33,20 @@ def get_driver():
     options.add_argument(f'--user-agent={random_user_agent}') 
     x = ChromeDriverManager(driver_version="116.0.5845.96").install()
     service = Service(x)
-    return webdriver.Chrome(service=service, options=options)
+    driver = webdriver.Chrome(service=service, options=options)
+    driver.get(link)
+    driver.implicitly_wait(wait)
+    time.sleep(wait)
+    output = []
+    if firstxpath:
+        firsttext = driver.find_element("xpath", firstxpath).text
+        output.append(str(firsttext))
+    if secondxpath:
+        secondtext = driver.find_element("xpath", secondxpath).text
+        output.append(str(secondtext))
+    driver.quit()
+    return output
+    
 
 user_agent = UserAgent()
 
@@ -62,7 +75,8 @@ with tab1:
 
 with tab2:
     st.write("Sensors provider:")
-    shadowfunk_tab, psyteam_tab, inkofarm_tab, hihello_tab, ie_tab = st.tabs(["shadowfunk", "psyteam", "inko farm", "hihello", "IE"])
+    # shadowfunk_tab, psyteam_tab, inkofarm_tab, hihello_tab, ie_tab = st.tabs(["shadowfunk", "psyteam", "inko farm", "hihello", "IE"])
+    shadowfunk_tab, psyteam_tab, inkofarm_tab = st.tabs(["shadowfunk", "psyteam", "inko farm"])
 
     def generate_data(id):
         THINGSPK_CHANNEL_ID = id
@@ -105,22 +119,14 @@ with tab2:
 
         if platform.system() == "Linux":
             with st.spinner(text="Retrieving data..."):
-                driver = get_driver()
-                driver.get("https://psyteam-fc61f.web.app/")
-                driver.implicitly_wait(7)
-                time.sleep(7)
-
-                temperature_xpath = "/html/body/div/main/div[2]/div[2]/div[1]"
-                target_temperature = driver.find_element("xpath", temperature_xpath)
-                condition_xpath = "/html/body/div/main/div[2]/div[2]/div[2]"
-                target_condition = driver.find_element("xpath", condition_xpath)
-                # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
+                retrieved_data = get_driver("https://psyteam-fc61f.web.app/",
+                                            7, "/html/body/div/main/div[2]/div[2]/div[1]",
+                                            "/html/body/div/main/div[2]/div[2]/div[2]") #temperature and condition
                 
                 col_t, col_c = st.columns(2)
-                col_t.metric(label=str(target_temperature.text).split("\n")[0], value=str(target_temperature.text).split("\n")[1])
-                col_c.metric(label=str(target_condition.text).split("\n")[0], value=str(target_condition.text).split("\n")[1])
+                col_t.metric(label=retrieved_data[0].split("\n")[0], value=retrieved_data[0].split("\n")[1])
+                col_c.metric(label=retrieved_data[1].split("\n")[0], value=retrieved_data[1].split("\n")[1])
                 style_metric_cards()
-                driver.quit()
 
     with inkofarm_tab:
         st.markdown("Data provided by Inko Farm's [dataset](https://thingspeak.com/channels/2246150).")
@@ -147,122 +153,104 @@ with tab2:
             st.plotly_chart(fig2, use_container_width=True)
             st.components.v1.iframe("https://thingspeak.com/channels/2246150/widgets/698517", height=400)
 
-        # if platform.system() == "Linux":
-        #     with st.spinner(text="Retrieving data..."):
-        #         driver = get_driver()
-        #         driver.get("https://thingspeak.com/channels/2246150/")
-        #         driver.implicitly_wait(7)
-        #         time.sleep(7)
-
-        #         temperature_xpath = "/html/body/div/div[1]/svg/g/g/g/g[5]"
-        #         target_temperature = driver.find_element("xpath", temperature_xpath)
-        #         ph_xpath = "/html/body/div/div[1]/svg/g/g/g/g[5]"
-        #         target_ph= driver.find_element("xpath", ph_xpath)
-        #         # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
-                
-        #         col_t, col_c = st.columns(2)
-        #         col_t.metric(label="Current Temperature", value=str(target_temperature.text))
-        #         col_c.metric(label="Current pH", value=str(target_ph.text))
-        #         style_metric_cards()
-        #         driver.quit()
         
-    with hihello_tab:
-        st.markdown("Taken from Hihello's [website](https://hifish.serv00.net/)")
+    # with hihello_tab:
+    #     st.markdown("Taken from Hihello's [website](https://hifish.serv00.net/)")
 
-        if platform.system() == "Linux":
-            with st.spinner(text="Retrieving data..."):
-                driver = get_driver()
-                driver.get("https://hifish.serv00.net/")
-                driver.implicitly_wait(3)
-                time.sleep(3)
+    #     if platform.system() == "Linux":
+    #         with st.spinner(text="Retrieving data..."):
+    #             driver = get_driver()
+    #             driver.get("https://hifish.serv00.net/")
+    #             driver.implicitly_wait(3)
+    #             time.sleep(3)
 
-                def gettext(path):
-                    return str(driver.find_element("xpath", path).text)
+    #             def gettext(path):
+    #                 return str(driver.find_element("xpath", path).text)
                 
-                temp_value = gettext("/html/body/div[1]/div[2]/div[2]/div/div[2]/p")
-                ph_value = gettext("/html/body/div[1]/div[2]/div[1]/div/div[2]/p")
-                phtemptable = driver.find_element("xpath", "/html/body/div[2]/div/div[2]/table")
-                feedtable = driver.find_element("xpath", "/html/body/div[2]/div/div[1]/table")
+    #             temp_value = gettext("/html/body/div[1]/div[2]/div[2]/div/div[2]/p")
+    #             ph_value = gettext("/html/body/div[1]/div[2]/div[1]/div/div[2]/p")
+    #             phtemptable = driver.find_element("xpath", "/html/body/div[2]/div/div[2]/table")
+    #             feedtable = driver.find_element("xpath", "/html/body/div[2]/div/div[1]/table")
                 
-                # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
+    #             # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
                 
-                col_t, col_ph = st.columns(2)
-                col_t.metric(label=temp_value.split()[0], value=str(temp_value.split()[1]))
-                col_ph.metric(label=ph_value.split()[0], value=str(ph_value.split()[1]))
-                style_metric_cards()
+    #             col_t, col_ph = st.columns(2)
+    #             col_t.metric(label=temp_value.split()[0], value=str(temp_value.split()[1]))
+    #             col_ph.metric(label=ph_value.split()[0], value=str(ph_value.split()[1]))
+    #             style_metric_cards()
                 
-                phtemp_html = phtemptable.get_attribute('outerHTML')
-                phtemp_dfs = pd.read_html(phtemp_html)
+    #             phtemp_html = phtemptable.get_attribute('outerHTML')
+    #             phtemp_dfs = pd.read_html(phtemp_html)
 
-                if phtemp_dfs:
-                    phtemp_df = phtemp_dfs[0]
-                    # st.write(df)
-                    col1, col2 = st.columns(2)
+    #             if phtemp_dfs:
+    #                 phtemp_df = phtemp_dfs[0]
+    #                 # st.write(df)
+    #                 col1, col2 = st.columns(2)
 
-                    with col1:
-                        fig_temp = px.line(phtemp_df, x="Waktu Kejadian", y='Nilai Temp (Celcius) Air', title='pH vs Date and Time')
-                        fig_temp.update_xaxes(title_text="Time", autorange='reversed')
-                        fig_temp.update_yaxes(title_text="°C")
-                        st.plotly_chart(fig_temp, use_container_width=True)
+    #                 with col1:
+    #                     fig_temp = px.line(phtemp_df, x="Waktu Kejadian", y='Nilai Temp (Celcius) Air', title='pH vs Date and Time')
+    #                     fig_temp.update_xaxes(title_text="Time", autorange='reversed')
+    #                     fig_temp.update_yaxes(title_text="°C")
+    #                     st.plotly_chart(fig_temp, use_container_width=True)
                         
-                    with col2:
-                        fig_pH = px.line(phtemp_df, x="Waktu Kejadian", y='Nilai pH Air', title='pH vs Date and Time')
-                        fig_pH.update_xaxes(title_text="Time", autorange='reversed')
-                        fig_pH.update_yaxes(title_text="pH")
-                        st.plotly_chart(fig_pH, use_container_width=True)
+    #                 with col2:
+    #                     fig_pH = px.line(phtemp_df, x="Waktu Kejadian", y='Nilai pH Air', title='pH vs Date and Time')
+    #                     fig_pH.update_xaxes(title_text="Time", autorange='reversed')
+    #                     fig_pH.update_yaxes(title_text="pH")
+    #                     st.plotly_chart(fig_pH, use_container_width=True)
 
-                else:
-                    st.write("No table data found")
+    #             else:
+    #                 st.write("No table data found")
 
-                feed_html = feedtable.get_attribute('outerHTML')
-                feed_dfs = pd.read_html(feed_html)
+    #             feed_html = feedtable.get_attribute('outerHTML')
+    #             feed_dfs = pd.read_html(feed_html)
                     
-                if feed_dfs:
-                    feed_df = feed_dfs[0]
-                    # st.write(feed_df)
-                    fig = px.scatter(
-                        feed_df, 
-                        x="Waktu Kejadian",
-                        y='Status HiFish',
-                        title='Machine Status Scatter Plot'
-                    )
+    #             if feed_dfs:
+    #                 feed_df = feed_dfs[0]
+    #                 # st.write(feed_df)
+    #                 fig = px.scatter(
+    #                     feed_df, 
+    #                     x="Waktu Kejadian",
+    #                     y='Status HiFish',
+    #                     title='Machine Status Scatter Plot'
+    #                 )
 
-                    # Customize the x-axis label and layout
-                    fig.update_xaxes(title_text="Time")
-                    fig.update_layout(showlegend=False)
+    #                 # Customize the x-axis label and layout
+    #                 fig.update_xaxes(title_text="Time")
+    #                 fig.update_layout(showlegend=False)
 
-                    # Display the plot
-                    st.plotly_chart(fig, use_container_width=True)
-                else:
-                    st.write("No table data found")
+    #                 # Display the plot
+    #                 st.plotly_chart(fig, use_container_width=True)
+    #             else:
+    #                 st.write("No table data found")
                     
-                driver.quit()
+    #             driver.quit()
 
-    with ie_tab:
-        st.markdown("Taken from ie's Thinger dashboard")
+    # with ie_tab:
+    #     st.markdown("Taken from ie's Thinger dashboard")
 
-        if platform.system() == "Linux":
-            with st.spinner(text="Retrieving data..."):
-                driver = get_driver()
-                driver.get(f"https://console.thinger.io/dashboards/ESP32?authorization={thingerauth}")
-                driver.implicitly_wait(5)
-                time.sleep(5)
+    #     if platform.system() == "Linux":
+    #         with st.spinner(text="Retrieving data..."):
+    #             driver = get_driver()
+    #             driver.get(f"https://console.thinger.io/dashboards/ESP32?authorization={thingerauth}")
+    #             driver.implicitly_wait(5)
+    #             time.sleep(5)
 
-                def gettext(path):
-                    return str(driver.find_element("xpath", path).text)
+    #             def gettext(path):
+    #                 return str(driver.find_element("xpath", path).text)
                 
-                temp_value = gettext("/html/body/ui-view/div/div[1]/div[2]/dashboard/div/div[3]/div/div/div/div/ul/li[2]/div/div[2]/div/div/div/donutchart-widget/div/div/span")
-                nh3_value = gettext("/html/body/ui-view/div/div[1]/div[2]/dashboard/div/div[3]/div/div/div/div/ul/li[3]/div/div[2]/div/div/div/donutchart-widget/div/div/span")
-                ph_value = gettext("/html/body/ui-view/div/div[1]/div[2]/dashboard/div/div[3]/div/div/div/div/ul/li[4]/div/div[2]/div/div/div/donutchart-widget/div/div/span")
+    #             temp_value = gettext("/html/body/ui-view/div/div[1]/div[2]/dashboard/div/div[3]/div/div/div/div/ul/li[2]/div/div[2]/div/div/div/donutchart-widget/div/div/span")
+    #             nh3_value = gettext("/html/body/ui-view/div/div[1]/div[2]/dashboard/div/div[3]/div/div/div/div/ul/li[3]/div/div[2]/div/div/div/donutchart-widget/div/div/span")
+    #             ph_value = gettext("/html/body/ui-view/div/div[1]/div[2]/dashboard/div/div[3]/div/div/div/div/ul/li[4]/div/div[2]/div/div/div/donutchart-widget/div/div/span")
                 
-                # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
+    #             # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
                 
-                col_t, col_nh3, col_ph = st.columns(3)
-                col_t.metric(label="Temperature", value=str(temp_value))
-                col_nh3.metric(label="Ammonia", value=str(nh3_value))
-                col_ph.metric(label="pH", value=str(ph_value))
-                style_metric_cards()
-                driver.quit()
+    #             col_t, col_nh3, col_ph = st.columns(3)
+    #             col_t.metric(label="Temperature", value=str(temp_value))
+    #             col_nh3.metric(label="Ammonia", value=str(nh3_value))
+    #             col_ph.metric(label="pH", value=str(ph_value))
+    #             style_metric_cards()
+    #             driver.quit()
 
 with tab3:
         # Mock GPT-based API
