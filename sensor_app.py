@@ -231,7 +231,7 @@ with tab2:
                     fig.update_layout(showlegend=False)
 
                     # Display the plot
-                    st.plotly_chart(fig)
+                    st.plotly_chart(fig, use_container_width=True)
                 else:
                     st.write("No table data found")
                     
