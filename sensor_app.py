@@ -193,7 +193,7 @@ with tab2:
                 col_ph.metric(label=ph_value.split()[0], value=str(ph_value.split()[1]))
                 style_metric_cards()
                 
-                phtemp_html = feedtable.get_attribute('outerHTML')
+                phtemp_html = phtemptable.get_attribute('outerHTML')
                 phtemp_dfs = pd.read_html(phtemp_html)
 
                 if phtemp_dfs:
