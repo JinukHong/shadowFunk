@@ -4,7 +4,8 @@ import numpy as np
 import datetime
 import collections
 import openai
-
+import requests
+import plotly.express as px
 
 openai.api_key = st.secrets["secrets"]['OPENAI_API_KEY']
 
@@ -23,24 +24,32 @@ with tab2:
 
     # Generate dummy data
     def generate_data():
-        time_range = pd.date_range(start="now", periods=60, freq="T")  # Every minute for an hour
-        temperature = np.random.uniform(20, 30, 60)  # Random temperature values between 20 and 30
-        pH = np.random.uniform(6.5, 7.5, 60)  # Random pH values between 6.5 and 7.5
-        return pd.DataFrame({
-            "Time": time_range,
-            "Temperature": temperature,
-            "pH": pH
-        })
+        THINGSPK_CHANNEL_ID = '2246162'
+        THINGSPK_API_READ_KEY = 'W5552EETGI8TGQJW'
+        URL = f'https://api.thingspeak.com/channels/{THINGSPK_CHANNEL_ID}/feeds.json?api_key={THINGSPK_API_READ_KEY}'
+        response = requests.get(URL)
+        data = response.json()
+
+        df_sensors = pd.DataFrame(data['feeds'])
+        df_sensors = df_sensors.astype({'field1':'float'})
+        df_sensors = df_sensors.astype({'field2':'float'})
+
+
+        return df_sensors
+
     data = generate_data()
 
     with col1 :
         st.subheader('Temperature over Time')
-        st.line_chart(data.set_index('Time')['Temperature'])
+        fig1 = px.line(data, x="created_at", y="field1", title='Temperature', markers=True)  # Assuming field1 is temperature
+        st.plotly_chart(fig1, use_container_width=True)
 
     
     with col2 :
         st.subheader('pH Level over Time')
-        st.line_chart(data.set_index('Time')['pH'])
+        fig2 = px.line(data, x="created_at", y="field2", title='PH', markers=True)  # Assuming field1 is temperature
+        st.plotly_chart(fig2, use_container_width=True)
+
 
 with tab3:
         # Mock GPT-based API
@@ -56,13 +65,13 @@ with tab3:
 
 
 
-    avg_temperature = data['Temperature'].mean()
-    min_temperature = data['Temperature'].min()
-    max_temperature = data['Temperature'].max()
+    avg_temperature = data['field1'].mean()
+    min_temperature = data['field1'].min()
+    max_temperature = data['field1'].max()
 
-    avg_pH = data['pH'].mean()
-    min_pH = data['pH'].min()
-    max_pH = data['pH'].max()
+    avg_pH = data['field2'].mean()
+    min_pH = data['field2'].min()
+    max_pH = data['field2'].max()
 
     # Define the optimal conditions for raising fish
     optimal_conditions = """
