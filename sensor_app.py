@@ -86,12 +86,16 @@ with tab2:
 
         with col1 :
             st.subheader('Temperature over Time')
-            fig1 = px.line(data, x="Time", y="°C", title='Temperature', markers=True)  # Assuming field1 is temperature
+            fig1 = px.line(data, x="created_at", y="field1", title='Temperature', markers=True)  # Assuming field1 is temperature
+            fig1.update_xaxes(title_text="Time")
+            fig1.update_yaxes(title_text="°C")
             st.plotly_chart(fig1, use_container_width=True)
-        
+
         with col2 :
             st.subheader('pH Level over Time')
-            fig2 = px.line(data, x="Time", y="pH", title='pH', markers=True)  # Assuming field1 is temperature
+            fig2 = px.line(data, x="created_at", y="field2", title='PH', markers=True)  # Assuming field1 is temperature
+            fig2.update_xaxes(title_text="Time")
+            fig2.update_yaxes(title_text="pH")
             st.plotly_chart(fig2, use_container_width=True)
 
     with psyteam_tab:
@@ -127,12 +131,16 @@ with tab2:
 
         with col1 :
             st.subheader('Temperature over Time')
-            fig1 = px.line(data, x="Time", y="°C", title='Temperature', markers=True)  # Assuming field1 is temperature
+            fig1 = px.line(data, x="created_at", y="field1", title='Temperature', markers=True)  # Assuming field1 is temperature
+            fig1.update_xaxes(title_text="Time")
+            fig1.update_yaxes(title_text="°C")
             st.plotly_chart(fig1, use_container_width=True)
-        
+
         with col2 :
             st.subheader('pH Level over Time')
-            fig2 = px.line(data, x="Time", y="pH", title='pH', markers=True)  # Assuming field1 is temperature
+            fig2 = px.line(data, x="created_at", y="field2", title='PH', markers=True)  # Assuming field1 is temperature
+            fig2.update_xaxes(title_text="Time")
+            fig2.update_yaxes(title_text="pH")
             st.plotly_chart(fig2, use_container_width=True)
 
 with tab3:
@@ -147,29 +155,30 @@ with tab3:
         else:
             return "I'm sorry, I don't understand that."
 
-    avg_temperature = data['Temperature'].mean()
-    min_temperature = data['Temperature'].min()
-    max_temperature = data['Temperature'].max()
+    # avg_temperature = data['Temperature'].mean()
+    # min_temperature = data['Temperature'].min()
+    # max_temperature = data['Temperature'].max()
 
-    avg_pH = data['pH'].mean()
-    min_pH = data['pH'].min()
-    max_pH = data['pH'].max()
+    # avg_pH = data['pH'].mean()
+    # min_pH = data['pH'].min()
+    # max_pH = data['pH'].max()
 
-    # Define the optimal conditions for raising fish
-    optimal_conditions = """
-    The optimal conditions for raising fish are a pH level between 6.5 and 7.5, and a temperature between 20°C and 25°C.
-    """
+    # # Define the optimal conditions for raising fish
+    # optimal_conditions = """
+    # The optimal conditions for raising fish are a pH level between 6.5 and 7.5, and a temperature between 20°C and 25°C.
+    # """
 
-    # Create the context message
+    # # Create the context message
 
-    system_message = f"""
-    Data read from Arduino:
-    - Average temperature: {avg_temperature:.2f}°C
-    - Average pH level: {avg_pH:.2f}
-    - Lowest pH level: {min_pH:.2f}
-    - Highest pH level: {max_pH:.2f}
-    {optimal_conditions}
-    """
+    # system_message = f"""
+    # Data read from Arduino:
+    # - Average temperature: {avg_temperature:.2f}°C
+    # - Average pH level: {avg_pH:.2f}
+    # - Lowest pH level: {min_pH:.2f}
+    # - Highest pH level: {max_pH:.2f}
+    # {optimal_conditions}
+    # """
+    system_message = ""
 
     # Chatbot interface
     st.caption("Tanya Seina tentang apapun:")
@@ -230,12 +239,3 @@ div.block-container {padding-top:2rem;}
 </style>
 """
 st.markdown(hide_footer_style, unsafe_allow_html=True)
-
-custom_css = """
-<style>
-[data-testid=column]:nth-of-type(1) [data-testid=stMarkdown]{
-    gap: 0rem;
-}
-</style>
-"""
-st.markdown(custom_css, unsafe_allow_html=True)
