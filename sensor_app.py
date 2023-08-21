@@ -88,11 +88,12 @@ with tab3:
     {optimal_conditions}
     """
 
-
     # Chatbot interface
-    user_message = st.text_input("Tanya Seina tentang apapun:", placeholder="Ketik disini, kemudian tekan Enter")
-    input_button = st.button("TAny")
     
+    user_message = st.text_input("Tanya Seina tentang apapun:", placeholder="Ketik disini, kemudian tekan tombol \"Tanya\"")
+    input_button = st.button("Tanya", use_container_width=True)
+    
+
     if not user_message:
         # DON'T FORGET TO UNCOMMENT THIS PART AFTER TESTING
         # user_message = "Given the data previously, what would be your advice?" 
@@ -107,11 +108,11 @@ with tab3:
     ", dan kemudian kamu akan menjawab pertanyaan berikut: "
 
     ending_message = """
-    (kemudian tulis juga jawaban yang sama namun dalam bahasa inggris, di baris yang baru (newline), dipisahkan dengan separator line. Ingat, hindari misinformasi. Bila ragu, minta maaf dan jangan lanjutkan menjawab.).
+    (kemudian tulis juga jawaban yang sama namun dalam bahasa inggris. Jawaban bahasa inggris akan berada di baris berikutnya, dipisahkan dengan baris kosong/newline. Ingat, hindari misinformasi. Bila ragu, minta maaf dan jangan lanjutkan menjawab.).
     """
     prompt = seina_message + user_message + ending_message
     # Response from the API
-    if user_message:
+    if user_message and input_button:
         with st.spinner(text="Tunggu sebentar, Seina masih berpikir🤔..."):
             completion = openai.ChatCompletion.create(model="gpt-3.5-turbo",
                                                     messages=[
