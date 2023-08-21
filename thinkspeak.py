@@ -20,3 +20,14 @@ fig1 = px.line(df, x="created_at", y="field1", title='Temperature', markers=True
 fig2 = px.line(df, x="created_at", y="field2", title='PH', markers=True)  # Assuming field1 is temperature
 st.plotly_chart(fig1, use_container_width=True)
 st.plotly_chart(fig2, use_container_width=True)
+
+
+avg_temperature = data['field1'].mean()
+min_temperature = data['field1'].min()
+max_temperature = data['field1'].max()
+
+avg_pH = data['field2'].mean()
+min_pH = data['field2'].min()
+max_pH = data['field2'].max()
+
+
