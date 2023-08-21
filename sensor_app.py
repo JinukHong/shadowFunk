@@ -318,6 +318,11 @@ with tab3:
     # """
     system_message = ""
 
+    image_row = row([2,7,1])
+    image_row.write("")
+    image_row.image("https://raw.githubusercontent.com/etherealxx/shadowFunx/mj-fixchromedriver/images/seina_banner_cropped.png", width=600)
+    image_row.write("")
+    
     # Chatbot interface
     st.caption("Tanya Seina tentang apapun:")
     chat_row = row([9,1])
@@ -356,7 +361,7 @@ with tab3:
             translated_response = GoogleTranslator(source='id', target='en').translate(response) 
 
         # final_response = response + "\n" + "-" * 30 + "\n" + translated_response
-        with st.chat_message("assistant", avatar="👧"):
+        with st.chat_message("assistant", avatar="https://raw.githubusercontent.com/etherealxx/shadowFunx/mj-fixchromedriver/images/seina_icon.png"):
             # st.write(f"{response}")
             write(chatwrite(response))
             st.divider()
