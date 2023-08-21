@@ -183,13 +183,22 @@ with tab2:
                 # target_condition = driver.find_element("xpath", condition_xpath)
                 temp_value = gettext(" /html/body/div[1]/div[2]/div[2]/div/div[2]/p")
                 ph_value = gettext("/html/body/div[1]/div[2]/div[1]/div/div[2]/p")
-                
+                tabletest = driver.find_element("xpath", "/html/body/div[2]/div/div[2]/table")
                 # pure_temperature = float(str(target_temperature.text).split("\n")[1].strip())
                 
                 col_t, col_ph = st.columns(2)
                 col_t.metric(label=temp_value.split()[0], value=str(temp_value.split()[1]))
                 col_ph.metric(label=ph_value.split()[0], value=str(ph_value.split()[1]))
                 style_metric_cards()
+                
+                table_html = tabletest.get_attribute('outerHTML')
+                dfs = pd.read_html(table_html)
+
+                if dfs:
+                    df = dfs[0]
+                    st.write(df)
+                else:
+                    st.write("No table data found")
                 driver.quit()
 
 with tab3:
