@@ -197,6 +197,9 @@ with tab2:
                 if dfs:
                     df = dfs[0]
                     st.write(df)
+                    fig_pH = px.line(df, x='Nilai pH Air', y="Waktu Kejadian", title='pH vs Date and Time')
+                    st.plotly_chart(fig_pH)
+
                 else:
                     st.write("No table data found")
                 driver.quit()
