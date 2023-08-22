@@ -18,8 +18,11 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from fake_useragent import UserAgent
 import plotly.express as px
+import plotly.graph_objects as go
 import requests
 import platform
+from statsmodels.tsa.arima.model import ARIMA
+from pmdarima import auto_arima
 
 def chatwrite(texttowrite):
     lines = texttowrite.split('\n')
@@ -147,7 +150,7 @@ with tab2:
     shadowfunk_tab, psyteam_tab, inkofarm_tab, hihello_tab, ie_tab = st.tabs(["shadowfunk", "psyteam", "inko farm", "hihello", "IE"])
     # shadowfunk_tab, psyteam_tab, inkofarm_tab = st.tabs(["shadowfunk", "psyteam", "inko farm"])
 
-    def generate_data(id):
+    def generate_data(id, rename=None):
         THINGSPK_CHANNEL_ID = id
         THINGSPK_API_READ_KEY = 'W5552EETGI8TGQJW'
         URL = f'https://api.thingspeak.com/channels/{THINGSPK_CHANNEL_ID}/feeds.json?api_key={THINGSPK_API_READ_KEY}'
@@ -157,7 +160,10 @@ with tab2:
         df_sensors = pd.DataFrame(data['feeds'])
         df_sensors = df_sensors.astype({'field1':'float'})
         df_sensors = df_sensors.astype({'field2':'float'})
-
+        if rename:
+          df_sensors.rename(columns={'created_at':'DateTime','field1':'Temperature','field2':'PH'}, inplace=True)
+          df_sensors['DateTime'] = pd.to_datetime(df_sensors['DateTime'])
+        
         return df_sensors
     
     with shadowfunk_tab:
@@ -165,23 +171,110 @@ with tab2:
 
         col1,col2 = st.columns([1,1])
 
-        # Generate dummy data
+        # def forecast_prophet(df, column_name):
+        #     # Prepare data for Prophet
+        #     df_prophet = df[['DateTime', column_name]].copy()  # Use .copy() to avoid modifying the original df
+        #     df_prophet['DateTime'] = df_prophet['DateTime'].dt.tz_localize(None)  # Remove timezone
+        #     df_prophet = df_prophet.rename(columns={'DateTime': 'ds', column_name: 'y'})
+
+        #     # Initialize and fit the model
+        #     model = Prophet(yearly_seasonality=True, daily_seasonality=True)
+        #     model.fit(df_prophet)
+
+        #     # Create a dataframe for future dates (e.g., 7 days into the future)
+        #     future = model.make_future_dataframe(periods=7)
+
+        #     # Forecast values
+        #     forecast = model.predict(future)
+
+        #     return forecast
+
+        def forecast_arima(data, column_name, steps=1):
+            # Using auto_arima to find the best parameters
+            model_auto = auto_arima(data[column_name], trace=False, error_action='ignore', suppress_warnings=True, stepwise=True)
+            #st.write(f"ARIMA order: {model_auto.order}")
+
+            model = ARIMA(data[column_name], order=model_auto.order)
+
+            model_fit = model.fit()
+            #st.write(model_fit.summary())
+
+            # Forecasting
+            last_date = data['DateTime'].iloc[-1]
+            forecast_dates = pd.date_range(last_date, periods=steps+1)[1:]
+            forecast = model_fit.forecast(steps=steps)
+
+            #st.write(forecast)
+
+            return forecast
+          
+        data = generate_data("2246162", "rename")
+
+        #st.write(data)
+        # Forecast temperature
+        forecast_temperature_arima = forecast_arima(data, 'Temperature', steps=24) # Assuming data is hourly
+
+        # For pH
+        forecast_pH_arima = forecast_arima(data, 'PH', steps=24)
+
+        last_real_data_date = data["DateTime"].max()
+
+    # This is the last date in your forecasted data. Note: You have to adjust it according to your forecasted DataFrame structure.
+        last_forecast_date = last_real_data_date + pd.Timedelta(hours=len(forecast_temperature_arima))
+        forecast_start_date = data["DateTime"].max()
+        forecast_end_date = forecast_start_date + pd.Timedelta(hours=len(forecast_temperature_arima) - 1) # Subtracting 1 to include the start date
+        forecast_dates = pd.date_range(start=forecast_start_date, end=forecast_end_date, freq='H')
+
+    # Temperature
+        st.markdown('### Temperature and Forecast')
+        fig_temp = go.Figure()
+        fig_temp.add_trace(go.Scatter(x=data["DateTime"], y=data["Temperature"], mode='lines+markers', name='Actual'))
+        fig_temp.add_trace(go.Scatter(x=forecast_dates, y=forecast_temperature_arima, mode='lines', name='Forecast'))
+
+        # Here, set the range for the x-axis
+        fig_temp.update_layout(xaxis_range=[last_real_data_date - pd.Timedelta(hours=len(data["DateTime"])), last_forecast_date])
+        one_day_ago = data["DateTime"].max() - pd.Timedelta(days=1)
+        forecast_end_date = data["DateTime"].max() + pd.Timedelta(hours=len(forecast_temperature_arima))
+
+        fig_temp.update_layout(xaxis_range=[one_day_ago, forecast_end_date])
+
+        st.plotly_chart(fig_temp, use_container_width=True)
+
+
+    # PH 
+        # st.subheader('pH Level over Time')
+        # fig2 = px.line(data, x="created_at", y="field2", title='PH', markers=True)  # Assuming field1 is temperature
+        # st.plotly_chart(fig2, use_container_width=True)
+        st.markdown('### PH and Forecast')
+        fig_ph = go.Figure()
+        fig_ph.add_trace(go.Scatter(x=data["DateTime"], y=data["PH"], mode='lines+markers', name='Actual'))
+        fig_ph.add_trace(go.Scatter(x=forecast_dates, y=forecast_pH_arima, mode='lines', name='Forecast'))
+        # Here, set the range for the x-axis
+        fig_ph.update_layout(xaxis_range=[last_real_data_date - pd.Timedelta(hours=len(data["DateTime"])), last_forecast_date])
+        one_day_ago = data["DateTime"].max() - pd.Timedelta(days=1)
+        forecast_end_date = data["DateTime"].max() + pd.Timedelta(hours=len(forecast_pH_arima))
+        fig_ph.update_layout(xaxis_range=[one_day_ago, forecast_end_date])
+        st.plotly_chart(fig_ph, use_container_width=True)
         
-        data = generate_data('2246162')
+#         col1,col2 = st.columns([1,1])
 
-        with col1 :
-            st.subheader('Temperature over Time')
-            fig1 = px.line(data, x="created_at", y="field1", title='Temperature', markers=True)  # Assuming field1 is temperature
-            fig1.update_xaxes(title_text="Time")
-            fig1.update_yaxes(title_text="°C")
-            st.plotly_chart(fig1, use_container_width=True)
+#         # Generate dummy data
+        
+#         data = generate_data('2246162')
 
-        with col2 :
-            st.subheader('pH Level over Time')
-            fig2 = px.line(data, x="created_at", y="field2", title='PH', markers=True)  # Assuming field1 is temperature
-            fig2.update_xaxes(title_text="Time")
-            fig2.update_yaxes(title_text="pH")
-            st.plotly_chart(fig2, use_container_width=True)
+#         with col1 :
+#             st.subheader('Temperature over Time')
+#             fig1 = px.line(data, x="created_at", y="field1", title='Temperature', markers=True)  # Assuming field1 is temperature
+#             fig1.update_xaxes(title_text="Time")
+#             fig1.update_yaxes(title_text="°C")
+#             st.plotly_chart(fig1, use_container_width=True)
+
+#         with col2 :
+#             st.subheader('pH Level over Time')
+#             fig2 = px.line(data, x="created_at", y="field2", title='PH', markers=True)  # Assuming field1 is temperature
+#             fig2.update_xaxes(title_text="Time")
+#             fig2.update_yaxes(title_text="pH")
+#             st.plotly_chart(fig2, use_container_width=True)
 
     with psyteam_tab:
         st.markdown("Taken from Psyteam's [website](https://psyteam-fc61f.web.app/)")
@@ -329,14 +422,26 @@ with tab3:
 
     # # Create the context message
 
-    # system_message = f"""
-    # Data read from Arduino:
-    # - Average temperature: {avg_temperature:.2f}°C
-    # - Average pH level: {avg_pH:.2f}
-    # - Lowest pH level: {min_pH:.2f}
-    # - Highest pH level: {max_pH:.2f}
-    # {optimal_conditions}
-    # """
+    avg_pH = data['PH'].mean()
+    min_pH = data['PH'].min()
+    max_pH = data['PH'].max()
+
+    # Define the optimal conditions for raising fish
+    optimal_conditions = """
+    The optimal conditions for raising fish are a pH level between 6.5 and 7.5, and a temperature between 20°C and 25°C.
+    """
+
+    # Create the context message
+
+    system_message = f"""
+    Based on the data:
+    - Average temperature: {avg_temperature:.2f}°C
+    - Average pH level: {avg_pH:.2f}
+    - Lowest pH level: {min_pH:.2f}
+    - Highest pH level: {max_pH:.2f}
+    {optimal_conditions}
+    """
+
     system_message = ""
 
     image_row = row([1,8,1], vertical_align="center")
@@ -352,7 +457,7 @@ with tab3:
 
     if not user_message:
         # DON'T FORGET TO UNCOMMENT THIS PART AFTER TESTING
-        # user_message = "Given the data previously, what would be your advice?" 
+        user_message = "Given the data previously, what would be your advice?" 
         pass
 
 
