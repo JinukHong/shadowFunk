@@ -76,7 +76,7 @@ openai.api_key = st.secrets["secrets"]['OPENAI_API_KEY']
 thingerauth = st.secrets["secrets"]['THINGER_AUTH']
 
 st.title('Sein Farm in your hand')
-tab1, tab2, tab3= st.tabs(['Beranda' , 'Statistik', 'Tanya Seina'])
+tab1, tab2, tab3, tab4 = st.tabs(['Beranda' , 'AR', 'Statistik', 'Tanya Seina'])
 
 with tab1:
 
@@ -126,6 +126,13 @@ with tab1:
     # st_folium(m, width=400, height=400, returned_objects=[])
 
 with tab2:
+    st.subheader('AR Experience')
+    image_row = row(3)
+    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker1")
+    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker2")
+    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker3")
+
+with tab3:
     col1,col2 = st.columns(2)
     with col1:
         st.write("Sensors provider:")
@@ -395,7 +402,7 @@ with tab2:
                 col_ph.metric(label="pH", value=retrieved_data[2])
                 style_metric_cards()
 
-with tab3:
+with tab4:
         # Mock GPT-based API
     def get_gpt_response(message, context):
         # In a real scenario, this function would call the GPT API and get a response.
@@ -451,7 +458,7 @@ with tab3:
 
     image_row = row([1,8,1], vertical_align="center")
     image_row.empty()
-    image_row.image("https://raw.githubusercontent.com/etherealxx/shadowFunx/mj-fixchromedriver/images/seina_banner_cropped_more.png")
+    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/seina_banner_cropped_friendly.png")
     image_row.empty()
     
     # Chatbot interface
@@ -497,6 +504,7 @@ with tab3:
             write(chatwrite(response))
             st.divider()
             write(chatwrite(translated_response))
+
 
 hide_footer_style = """
 <style>
