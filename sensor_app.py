@@ -6,10 +6,9 @@ import collections
 import openai
 import requests
 import plotly.express as px
-from prophet import Prophet
 import plotly.graph_objects as go
-
-
+from statsmodels.tsa.arima.model import ARIMA
+from pmdarima import auto_arima
 
 openai.api_key = st.secrets["secrets"]['OPENAI_API_KEY']
 
@@ -42,60 +41,89 @@ with tab2:
 
         return df_sensors
     
-    def forecast_data(df, column_name):
-        # Prepare data for Prophet
-        df_prophet = df[['DateTime', column_name]].copy()  # Use .copy() to avoid modifying the original df
-        df_prophet['DateTime'] = df_prophet['DateTime'].dt.tz_localize(None)  # Remove timezone
-        df_prophet = df_prophet.rename(columns={'DateTime': 'ds', column_name: 'y'})
+    # def forecast_prophet(df, column_name):
+    #     # Prepare data for Prophet
+    #     df_prophet = df[['DateTime', column_name]].copy()  # Use .copy() to avoid modifying the original df
+    #     df_prophet['DateTime'] = df_prophet['DateTime'].dt.tz_localize(None)  # Remove timezone
+    #     df_prophet = df_prophet.rename(columns={'DateTime': 'ds', column_name: 'y'})
 
-        # Initialize and fit the model
-        model = Prophet(yearly_seasonality=True, daily_seasonality=True)
-        model.fit(df_prophet)
+    #     # Initialize and fit the model
+    #     model = Prophet(yearly_seasonality=True, daily_seasonality=True)
+    #     model.fit(df_prophet)
 
-        # Create a dataframe for future dates (e.g., 7 days into the future)
-        future = model.make_future_dataframe(periods=7)
+    #     # Create a dataframe for future dates (e.g., 7 days into the future)
+    #     future = model.make_future_dataframe(periods=7)
 
-        # Forecast values
-        forecast = model.predict(future)
+    #     # Forecast values
+    #     forecast = model.predict(future)
         
-        return forecast
-
-
-
-    data = generate_data()
-    st.write(data)
-    # Forecast temperature
-    forecast_temperature = forecast_data(data, 'Temperature')
-    # Forecast pH
-    forecast_pH = forecast_data(data, 'PH')
-
-
-    with col1 :
-        # st.subheader('Temperature over Time')
-        # fig1 = px.line(data, x="created_at", y="field1", title='Temperature', markers=True)  # Assuming field1 is temperature
-        # st.plotly_chart(fig1, use_container_width=True)
-        st.markdown('### Temperature and Forecast')
-        last_real_data_date = data["DateTime"].max()
-        last_forecast_date = forecast_temperature['ds'].max()
-        fig_temp = go.Figure()
-        fig_temp.add_trace(go.Scatter(x=data["DateTime"], y=data["temperature"], mode='lines+markers', name='Actual'))
-        fig_temp.add_trace(go.Scatter(x=forecast_temperature['ds'], y=forecast_temperature['yhat'], mode='lines', name='Forecast'))
-        fig_temp.update_layout(xaxis_range=[last_real_data_date - pd.Timedelta(days=1), last_forecast_date + pd.Timedelta(days=1)])
-        st.plotly_chart(fig_temp, use_container_width=True)
-
-
+    #     return forecast
     
-    with col2 :
-        # st.subheader('pH Level over Time')
-        # fig2 = px.line(data, x="created_at", y="field2", title='PH', markers=True)  # Assuming field1 is temperature
-        # st.plotly_chart(fig2, use_container_width=True)
-        st.markdown('### pH Level and Forecast')
-        last_forecast_date = forecast_temperature['ds'].max()
-        fig_temp = go.Figure()
-        fig_temp.add_trace(go.Scatter(x=data["DateTime"], y=data["PH"], mode='lines+markers', name='Actual'))
-        fig_temp.add_trace(go.Scatter(x=forecast_temperature['ds'], y=forecast_temperature['yhat'], mode='lines', name='Forecast'))
-        fig_temp.update_layout(xaxis_range=[last_real_data_date - pd.Timedelta(days=1), last_forecast_date + pd.Timedelta(days=1)])
-        st.plotly_chart(fig_temp, use_container_width=True)
+    def forecast_arima(data, column_name, steps=1):
+        # Using auto_arima to find the best parameters
+        model_auto = auto_arima(data[column_name], trace=False, error_action='ignore', suppress_warnings=True, stepwise=True)
+        #st.write(f"ARIMA order: {model_auto.order}")
+
+        model = ARIMA(data[column_name], order=model_auto.order)
+
+        model_fit = model.fit()
+        #st.write(model_fit.summary())
+        
+        # Forecasting
+        last_date = data['DateTime'].iloc[-1]
+        forecast_dates = pd.date_range(last_date, periods=steps+1)[1:]
+        forecast = model_fit.forecast(steps=steps)
+
+        #st.write(forecast)
+
+        return forecast
+    data = generate_data()
+    
+    #st.write(data)
+    # Forecast temperature
+    forecast_temperature_arima = forecast_arima(data, 'Temperature', steps=24) # Assuming data is hourly
+
+    # For pH
+    forecast_pH_arima = forecast_arima(data, 'PH', steps=24)
+
+    last_real_data_date = data["DateTime"].max()
+
+# This is the last date in your forecasted data. Note: You have to adjust it according to your forecasted DataFrame structure.
+    last_forecast_date = last_real_data_date + pd.Timedelta(hours=len(forecast_temperature_arima))
+    forecast_start_date = data["DateTime"].max()
+    forecast_end_date = forecast_start_date + pd.Timedelta(hours=len(forecast_temperature_arima) - 1) # Subtracting 1 to include the start date
+    forecast_dates = pd.date_range(start=forecast_start_date, end=forecast_end_date, freq='H')
+
+# Temperature
+    st.markdown('### Temperature and Forecast')
+    fig_temp = go.Figure()
+    fig_temp.add_trace(go.Scatter(x=data["DateTime"], y=data["Temperature"], mode='lines+markers', name='Actual'))
+    fig_temp.add_trace(go.Scatter(x=forecast_dates, y=forecast_temperature_arima, mode='lines', name='Forecast'))
+    
+    # Here, set the range for the x-axis
+    fig_temp.update_layout(xaxis_range=[last_real_data_date - pd.Timedelta(hours=len(data["DateTime"])), last_forecast_date])
+    one_day_ago = data["DateTime"].max() - pd.Timedelta(days=1)
+    forecast_end_date = data["DateTime"].max() + pd.Timedelta(hours=len(forecast_temperature_arima))
+
+    fig_temp.update_layout(xaxis_range=[one_day_ago, forecast_end_date])
+
+    st.plotly_chart(fig_temp, use_container_width=True)
+
+
+# PH 
+    # st.subheader('pH Level over Time')
+    # fig2 = px.line(data, x="created_at", y="field2", title='PH', markers=True)  # Assuming field1 is temperature
+    # st.plotly_chart(fig2, use_container_width=True)
+    st.markdown('### PH and Forecast')
+    fig_ph = go.Figure()
+    fig_ph.add_trace(go.Scatter(x=data["DateTime"], y=data["PH"], mode='lines+markers', name='Actual'))
+    fig_ph.add_trace(go.Scatter(x=forecast_dates, y=forecast_pH_arima, mode='lines', name='Forecast'))
+    # Here, set the range for the x-axis
+    fig_ph.update_layout(xaxis_range=[last_real_data_date - pd.Timedelta(hours=len(data["DateTime"])), last_forecast_date])
+    one_day_ago = data["DateTime"].max() - pd.Timedelta(days=1)
+    forecast_end_date = data["DateTime"].max() + pd.Timedelta(hours=len(forecast_pH_arima))
+    fig_ph.update_layout(xaxis_range=[one_day_ago, forecast_end_date])
+    st.plotly_chart(fig_ph, use_container_width=True)
 
 
 
@@ -113,13 +141,13 @@ with tab3:
 
 
 
-    avg_temperature = data['field1'].mean()
-    min_temperature = data['field1'].min()
-    max_temperature = data['field1'].max()
+    avg_temperature = data['Temperature'].mean()
+    min_temperature = data['Temperature'].min()
+    max_temperature = data['Temperature'].max()
 
-    avg_pH = data['field2'].mean()
-    min_pH = data['field2'].min()
-    max_pH = data['field2'].max()
+    avg_pH = data['PH'].mean()
+    min_pH = data['PH'].min()
+    max_pH = data['PH'].max()
 
     # Define the optimal conditions for raising fish
     optimal_conditions = """
