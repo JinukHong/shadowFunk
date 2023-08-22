@@ -318,10 +318,10 @@ with tab3:
     # """
     system_message = ""
 
-    image_row = row([2,7,1])
-    image_row.write("")
-    image_row.image("https://raw.githubusercontent.com/etherealxx/shadowFunx/mj-fixchromedriver/images/seina_banner_cropped.png", width=600)
-    image_row.write("")
+    # image_row = row([2,7,1])
+    # image_row.write("")
+    st.image("https://raw.githubusercontent.com/etherealxx/shadowFunx/mj-fixchromedriver/images/seina_banner_cropped_more.png")
+    # image_row.write("")
     
     # Chatbot interface
     st.caption("Tanya Seina tentang apapun:")
