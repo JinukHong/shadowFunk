@@ -24,6 +24,8 @@ import platform
 from statsmodels.tsa.arima.model import ARIMA
 from pmdarima import auto_arima
 
+shadowfunk_data = None
+
 def chatwrite(texttowrite):
     lines = texttowrite.split('\n')
     for line in lines:
@@ -207,7 +209,7 @@ with tab2:
             #st.write(forecast)
 
             return forecast
-          
+        
         data = generate_data("2246162", "rename")
 
         #st.write(data)
@@ -256,6 +258,8 @@ with tab2:
         fig_ph.update_layout(xaxis_range=[one_day_ago, forecast_end_date])
         st.plotly_chart(fig_ph, use_container_width=True)
         
+        shadowfunk_data = data
+
 #         col1,col2 = st.columns([1,1])
 
 #         # Generate dummy data
@@ -422,9 +426,9 @@ with tab3:
 
     # # Create the context message
 
-    avg_pH = data['PH'].mean()
-    min_pH = data['PH'].min()
-    max_pH = data['PH'].max()
+    avg_pH = shadowfunk_data['PH'].mean()
+    min_pH = shadowfunk_data['PH'].min()
+    max_pH = shadowfunk_data['PH'].max()
 
     # Define the optimal conditions for raising fish
     optimal_conditions = """
@@ -432,10 +436,9 @@ with tab3:
     """
 
     # Create the context message
-
+    # - Average temperature: {avg_temperature:.2f}°C
     system_message = f"""
     Based on the data:
-    - Average temperature: {avg_temperature:.2f}°C
     - Average pH level: {avg_pH:.2f}
     - Lowest pH level: {min_pH:.2f}
     - Highest pH level: {max_pH:.2f}
