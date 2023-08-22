@@ -8,6 +8,7 @@ from streamlit_extras.streaming_write import write
 from streamlit_extras.row import row
 from streamlit_extras.metric_cards import style_metric_cards
 from streamlit_extras.mention import mention
+from streamlit_extras.stylable_container import stylable_container
 from streamlit_player import st_player
 from deep_translator import GoogleTranslator
 import time
@@ -122,7 +123,27 @@ with tab1:
     # st_folium(m, width=400, height=400, returned_objects=[])
 
 with tab2:
-    st.write("Sensors provider:")
+    col1,col2 = st.columns(2)
+    with col1:
+        st.write("Sensors provider:")
+    
+    with col2:
+        # with stylable_container(
+        #     key="red_button",
+        #     css_styles="""
+        #         button {
+        #             background-color: red;
+        #             color: white;
+        #             border-radius: 20px;
+        #         }
+        #         """,
+        # ):
+        update_button = st.button("Update Data")
+    
+        if update_button:
+            with st.spinner("Refreshing data..."):
+                st.cache_data.clear()
+        
     shadowfunk_tab, psyteam_tab, inkofarm_tab, hihello_tab, ie_tab = st.tabs(["shadowfunk", "psyteam", "inko farm", "hihello", "IE"])
     # shadowfunk_tab, psyteam_tab, inkofarm_tab = st.tabs(["shadowfunk", "psyteam", "inko farm"])
 
@@ -318,10 +339,10 @@ with tab3:
     # """
     system_message = ""
 
-    # image_row = row([2,7,1])
-    # image_row.write("")
-    st.image("https://raw.githubusercontent.com/etherealxx/shadowFunx/mj-fixchromedriver/images/seina_banner_cropped_more.png")
-    # image_row.write("")
+    image_row = row([1,8,1], vertical_align="center")
+    image_row.empty()
+    image_row.image("https://raw.githubusercontent.com/etherealxx/shadowFunx/mj-fixchromedriver/images/seina_banner_cropped_more.png")
+    image_row.empty()
     
     # Chatbot interface
     st.caption("Tanya Seina tentang apapun:")
