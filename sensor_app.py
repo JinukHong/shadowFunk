@@ -128,9 +128,9 @@ with tab1:
 with tab2:
     st.subheader('AR Experience')
     image_row = row(3)
-    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker1")
-    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker2")
-    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker3")
+    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker1.png")
+    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker2.png")
+    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker3.png")
 
 with tab3:
     col1,col2 = st.columns(2)
