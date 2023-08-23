@@ -133,7 +133,7 @@ with tab2:
     # image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker3.png", width=400)
     image_row = row([1,8,1], vertical_align="center")
     image_row.empty()
-    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker_row.png")
+    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker_row_small.png")
     image_row.empty()
     st.markdown("Kalian menemukan logo-logo berikut di sekitar Sein Farm? Download aplikasi AR dibawah, gunakan aplikasinya, arahkan kameramu ke gambar tersebut, dan temukan fakta-fakta menarik seputar flora & fauna di Sein Farm secara ajaib!")
     button_row = row([2,6,2], vertical_align="center")
