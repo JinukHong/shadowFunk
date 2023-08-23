@@ -135,28 +135,38 @@ with tab2:
     image_row.empty()
     image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker_row.png")
     image_row.empty()
+    st.markdown("Kalian menemukan logo-logo berikut di sekitar Sein Farm? Download aplikasi AR dibawah, gunakan aplikasinya, arahkan kameramu ke gambar tersebut, dan temukan fakta-fakta menarik seputar flora & fauna di Sein Farm secara ajaib!")
+    button_row = row([2,6,2], vertical_align="center")
+    app_download_link = "https://drive.google.com/uc?export=download&id=10vZdMBogAIzD6XRGVOh_QpOVlmi-xXWb"
+    button_row.empty()
+    button_row.markdown(
+    f'<a href="{app_download_link}" style="display: inline-block; width: 100%; padding: 12px 0; background-color: red; color: white; text-align: center; text-decoration: none; font-size: 16px; border-radius: 4px;">Download Aplikasi Disini</a>',
+    unsafe_allow_html=True
+)
+    
+    button_row.empty()
 
 with tab3:
-    col1,col2 = st.columns(2)
-    with col1:
-        st.write("Sensors provider:")
+    # col1,col2 = st.columns(2)
+    # with col1:
+    st.caption("Sensors provider:")
     
-    with col2:
-        # with stylable_container(
-        #     key="red_button",
-        #     css_styles="""
-        #         button {
-        #             background-color: red;
-        #             color: white;
-        #             border-radius: 20px;
-        #         }
-        #         """,
-        # ):
-        update_button = st.button("Update Data")
+    # with col2:
+    #     # with stylable_container(
+    #     #     key="red_button",
+    #     #     css_styles="""
+    #     #         button {
+    #     #             background-color: red;
+    #     #             color: white;
+    #     #             border-radius: 20px;
+    #     #         }
+    #     #         """,
+    #     # ):
+    #     update_button = st.button("Update All Data")
     
-        if update_button:
-            with st.spinner("Refreshing data..."):
-                st.cache_data.clear()
+    #     if update_button:
+    #         with st.spinner("Refreshing data..."):
+    #             st.cache_data.clear()
         
     shadowfunk_tab, psyteam_tab, inkofarm_tab, hihello_tab, ie_tab = st.tabs(["shadowfunk", "psyteam", "inko farm", "hihello", "IE"])
     # shadowfunk_tab, psyteam_tab, inkofarm_tab = st.tabs(["shadowfunk", "psyteam", "inko farm"])
@@ -178,7 +188,27 @@ with tab3:
         return df_sensors
     
     with shadowfunk_tab:
-        st.write('Data provided by ShadowFunk team.')
+
+        buttoncol1,buttoncol2 = st.columns(2)
+        with buttoncol1:
+            st.write('Data provided by ShadowFunk team.')
+        
+        with buttoncol2:
+            # with stylable_container(
+            #     key="red_button",
+            #     css_styles="""
+            #         button {
+            #             background-color: red;
+            #             color: white;
+            #             border-radius: 20px;
+            #         }
+            #         """,
+            # ):
+            update_button = st.button("Update All Data", key="shadowfunk_b")
+        
+            if update_button:
+                with st.spinner("Refreshing data..."):
+                    st.cache_data.clear()
 
         col1,col2 = st.columns([1,1])
 
@@ -288,7 +318,16 @@ with tab3:
 #             st.plotly_chart(fig2, use_container_width=True)
 
     with psyteam_tab:
-        st.markdown("Taken from Psyteam's [website](https://psyteam-fc61f.web.app/)")
+        buttoncol1,buttoncol2 = st.columns(2)
+        with buttoncol1:
+            st.markdown("Taken from Psyteam's [website](https://psyteam-fc61f.web.app/)")
+        
+        with buttoncol2:
+            update_button = st.button("Update All Data", key="psyteam_b")
+        
+            if update_button:
+                with st.spinner("Refreshing data..."):
+                    st.cache_data.clear()
 
         if platform.system() == "Linux":
             with st.spinner(text="Retrieving data..."):
@@ -302,7 +341,16 @@ with tab3:
                 style_metric_cards()
 
     with inkofarm_tab:
-        st.markdown("Data provided by Inko Farm's [dataset](https://thingspeak.com/channels/2246150).")
+        buttoncol1,buttoncol2 = st.columns(2)
+        with buttoncol1:
+            st.markdown("Taken from Psyteam's [website](https://psyteam-fc61f.web.app/)")
+        
+        with buttoncol2:
+            update_button = st.button("Update All Data", key="inkofarm_b")
+        
+            if update_button:
+                with st.spinner("Refreshing data..."):
+                    st.cache_data.clear()
 
         col1,col2 = st.columns([1,1])
 
@@ -367,10 +415,17 @@ with tab3:
             fig_ph.update_layout(xaxis_range=[one_day_ago, forecast_end_date])
             st.plotly_chart(fig_ph, use_container_width=True)
 
-       
-        
     with hihello_tab:
-        st.markdown("Taken from Hihello's [website](https://hifish.serv00.net/)")
+        buttoncol1,buttoncol2 = st.columns(2)
+        with buttoncol1:
+            st.markdown("Taken from Hihello's [website](https://hifish.serv00.net/)")
+        
+        with buttoncol2:
+            update_button = st.button("Update All Data", key="hihello_b")
+        
+            if update_button:
+                with st.spinner("Refreshing data..."):
+                    st.cache_data.clear()
 
         if platform.system() == "Linux":
             with st.spinner(text="Retrieving data..."):
@@ -417,7 +472,7 @@ with tab3:
                         feed_df, 
                         x="Waktu Kejadian",
                         y='Status HiFish',
-                        title='Machine Status Scatter Plot'
+                        title='Status Alat Pakan'
                     )
 
                     # Customize the x-axis label and layout
@@ -430,7 +485,16 @@ with tab3:
                     st.write("No table data found")
                     
     with ie_tab:
-        st.markdown("Taken from ie's Thinger dashboard")
+        buttoncol1,buttoncol2 = st.columns(2)
+        with buttoncol1:
+            st.markdown("Taken from ie's Thinger dashboard")
+        
+        with buttoncol2:
+            update_button = st.button("Update All Data", key="ie_b")
+        
+            if update_button:
+                with st.spinner("Refreshing data..."):
+                    st.cache_data.clear()
 
         if platform.system() == "Linux":
             with st.spinner(text="Retrieving data..."):
