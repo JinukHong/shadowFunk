@@ -99,13 +99,13 @@ with tab1:
 
     with st.expander("📽️Tonton Video"):
         col1, col2 = st.columns(2)
-        st_player("https://www.youtube.com/watch?v=AssCNc-y04g", light=True, playing=True)
-        # with col1:
-        #     st_player("https://www.youtube.com/watch?v=zeITiv8Dt0A", light=True, playing=True)
-        #     st_player("https://www.youtube.com/watch?v=Nl5I5trYKnw", light=True, playing=True)
-        # with col2:
-        #     st_player("https://www.youtube.com/watch?v=la93X4uoXuw", light=True, playing=True)
-        #     st_player("https://www.youtube.com/watch?v=wHaTpEOUOq8", light=True, playing=True)
+        #st_player("https://www.youtube.com/watch?v=AssCNc-y04g", light=True, playing=True)
+        with col1:
+            st_player("https://www.youtube.com/watch?v=zeITiv8Dt0A", light=True, playing=True)
+            st_player("https://www.youtube.com/watch?v=Nl5I5trYKnw", light=True, playing=True)
+        with col2:
+            st_player("https://www.youtube.com/watch?v=la93X4uoXuw", light=True, playing=True)
+            st_player("https://www.youtube.com/watch?v=wHaTpEOUOq8", light=True, playing=True)
             
     google_map_html = """
         https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.8752298774416!2d107.71661211431697!3d-6.90552036949942!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68dda940094b3f%3A0x339ec5e7ed736051!2sSEIN%20FARM!5e0!3m2!1sen!2sid!4v1640677700472!5m2!1sen!2sid
