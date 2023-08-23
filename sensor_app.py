@@ -279,7 +279,7 @@ with tab3:
 
         fig_temp.update_layout(xaxis_range=[one_day_ago, forecast_end_date])
 
-        st.plotly_chart(fig_temp, use_container_width=True)
+        col1.plotly_chart(fig_temp, use_container_width=True)
 
 
     # PH 
@@ -295,7 +295,7 @@ with tab3:
         one_day_ago = data["DateTime"].max() - pd.Timedelta(days=1)
         forecast_end_date = data["DateTime"].max() + pd.Timedelta(hours=len(forecast_pH_arima))
         fig_ph.update_layout(xaxis_range=[one_day_ago, forecast_end_date])
-        st.plotly_chart(fig_ph, use_container_width=True)
+        col2.plotly_chart(fig_ph, use_container_width=True)
         
 #         col1,col2 = st.columns([1,1])
 
