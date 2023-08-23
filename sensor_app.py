@@ -99,10 +99,10 @@ with tab1:
 
     with st.expander("📽️Tonton Video"):
         col1, col2 = st.columns(2)
-        #st_player("https://www.youtube.com/watch?v=AssCNc-y04g", light=True, playing=True)
+        #
         with col1:
+            st_player("https://www.youtube.com/watch?v=AssCNc-y04g", light=True, playing=True)
             st_player("https://www.youtube.com/watch?v=zeITiv8Dt0A", light=True, playing=True)
-            st_player("https://www.youtube.com/watch?v=Nl5I5trYKnw", light=True, playing=True)
         with col2:
             st_player("https://www.youtube.com/watch?v=la93X4uoXuw", light=True, playing=True)
             st_player("https://www.youtube.com/watch?v=wHaTpEOUOq8", light=True, playing=True)
