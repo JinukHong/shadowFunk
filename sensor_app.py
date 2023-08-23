@@ -30,7 +30,7 @@ def chatwrite(texttowrite):
         yield line + "\n"
         time.sleep(0.05)
 
-@st.cache_data(ttl=300, show_spinner="Retrieving from cache...")
+@st.cache_data(ttl=1200, show_spinner="Retrieving from cache...")
 def get_driver(link, wait, firstxpath=None, secondxpath=None, thirdxpath=None, firsttablexpath=None, secondtablexpath=None):
     random_user_agent = user_agent.random
     options = Options()
