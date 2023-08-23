@@ -297,8 +297,25 @@ with tab2:
         col1,col2 = st.columns([1,1])
 
         # Generate dummy data
+        def generate_data_inco(id, rename=None):
+            THINGSPK_CHANNEL_ID = id
+            THINGSPK_API_READ_KEY = 'W5552EETGI8TGQJW'
+            URL = f'https://api.thingspeak.com/channels/{THINGSPK_CHANNEL_ID}/feeds.json?api_key={THINGSPK_API_READ_KEY}'
+            response = requests.get(URL)
+            data = response.json()
+
+            df_sensors = pd.DataFrame(data['feeds'])
+            df_sensors = df_sensors.astype({'field1':'float'})
+            df_sensors = df_sensors.astype({'field2':'float'})
+            
+            df_sensors.rename(columns={'created_at':'DateTime','field1':'Temperature','field2':'PH'}, inplace=True)
+            df_sensors['DateTime'] = pd.to_datetime(df_sensors['DateTime'])
+            
+            return df_sensors
+
         
-        data = generate_data('2246150')
+        data = generate_data_inco('2246150')
+        
         forecast_temperature_arima = forecast_arima(data, 'Temperature', steps=24) # Assuming data is hourly
 
         # For pH
