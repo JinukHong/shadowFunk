@@ -127,10 +127,14 @@ with tab1:
 
 with tab2:
     st.subheader('AR Experience')
-    image_row = row(3)
-    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker1.png")
-    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker2.png")
-    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker3.png")
+    # image_row = row(3)
+    # image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker1.png", width=400)
+    # image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker2.png", width=400)
+    # image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker3.png", width=400)
+    image_row = row([1,8,1], vertical_align="center")
+    image_row.empty()
+    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker_row.png")
+    image_row.empty()
 
 with tab3:
     col1,col2 = st.columns(2)
@@ -495,8 +499,6 @@ with tab4:
     - Highest pH level: {max_pH:.2f}
     {optimal_conditions}
     """
-
-    system_message = ""
 
     image_row = row([1,8,1], vertical_align="center")
     image_row.empty()
