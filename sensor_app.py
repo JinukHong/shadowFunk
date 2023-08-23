@@ -76,7 +76,7 @@ openai.api_key = st.secrets["secrets"]['OPENAI_API_KEY']
 thingerauth = st.secrets["secrets"]['THINGER_AUTH']
 
 st.title('Sein Farm in your hand')
-tab1, tab2, tab3, tab4 = st.tabs(['Beranda' , 'AR', 'Statistik', 'Tanya Seina'])
+tab1, tab2, tab3= st.tabs(['Beranda' , 'Statistik', 'Tanya Seina'])
 
 with tab1:
 
@@ -126,13 +126,6 @@ with tab1:
     # st_folium(m, width=400, height=400, returned_objects=[])
 
 with tab2:
-    st.subheader('AR Experience')
-    image_row = row(3)
-    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker1.png")
-    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker2.png")
-    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/tracker3.png")
-
-with tab3:
     col1,col2 = st.columns(2)
     with col1:
         st.write("Sensors provider:")
@@ -305,23 +298,48 @@ with tab3:
         # Generate dummy data
         
         data = generate_data('2246150')
+        forecast_temperature_arima = forecast_arima(data, 'Temperature', steps=24) # Assuming data is hourly
 
+        # For pH
+        forecast_pH_arima = forecast_arima(data, 'PH', steps=24)
+
+        last_real_data_date = data["DateTime"].max()
+
+    # This is the last date in your forecasted data. Note: You have to adjust it according to your forecasted DataFrame structure.
+        last_forecast_date = last_real_data_date + pd.Timedelta(hours=len(forecast_temperature_arima))
+        forecast_start_date = data["DateTime"].max()
+        forecast_end_date = forecast_start_date + pd.Timedelta(hours=len(forecast_temperature_arima) - 1) # Subtracting 1 to include the start date
+        forecast_dates = pd.date_range(start=forecast_start_date, end=forecast_end_date, freq='H')
+
+    # Temperature
         with col1 :
-            st.subheader('Temperature over Time')
-            fig1 = px.line(data, x="created_at", y="field1", title='Temperature', markers=True)  # Assuming field1 is temperature
-            fig1.update_xaxes(title_text="Time")
-            fig1.update_yaxes(title_text="°C")
-            st.plotly_chart(fig1, use_container_width=True)
-            st.components.v1.iframe("https://thingspeak.com/channels/2246150/widgets/698516", height=400)
+            st.markdown('### Temperature and Forecast')
+            fig_temp = go.Figure()
+            fig_temp.add_trace(go.Scatter(x=data["DateTime"], y=data["Temperature"], mode='lines+markers', name='Actual'))
+            fig_temp.add_trace(go.Scatter(x=forecast_dates, y=forecast_temperature_arima, mode='lines', name='Forecast'))
+
+            # Here, set the range for the x-axis
+            fig_temp.update_layout(xaxis_range=[last_real_data_date - pd.Timedelta(hours=len(data["DateTime"])), last_forecast_date])
+            one_day_ago = data["DateTime"].max() - pd.Timedelta(days=1)
+            forecast_end_date = data["DateTime"].max() + pd.Timedelta(hours=len(forecast_temperature_arima))
+
+            fig_temp.update_layout(xaxis_range=[one_day_ago, forecast_end_date])
+
+            st.plotly_chart(fig_temp, use_container_width=True)
 
         with col2 :
-            st.subheader('pH Level over Time')
-            fig2 = px.line(data, x="created_at", y="field2", title='PH', markers=True)  # Assuming field1 is temperature
-            fig2.update_xaxes(title_text="Time")
-            fig2.update_yaxes(title_text="pH")
-            st.plotly_chart(fig2, use_container_width=True)
-            st.components.v1.iframe("https://thingspeak.com/channels/2246150/widgets/698517", height=400)
+            st.markdown('### PH and Forecast')
+            fig_ph = go.Figure()
+            fig_ph.add_trace(go.Scatter(x=data["DateTime"], y=data["PH"], mode='lines+markers', name='Actual'))
+            fig_ph.add_trace(go.Scatter(x=forecast_dates, y=forecast_pH_arima, mode='lines', name='Forecast'))
+            # Here, set the range for the x-axis
+            fig_ph.update_layout(xaxis_range=[last_real_data_date - pd.Timedelta(hours=len(data["DateTime"])), last_forecast_date])
+            one_day_ago = data["DateTime"].max() - pd.Timedelta(days=1)
+            forecast_end_date = data["DateTime"].max() + pd.Timedelta(hours=len(forecast_pH_arima))
+            fig_ph.update_layout(xaxis_range=[one_day_ago, forecast_end_date])
+            st.plotly_chart(fig_ph, use_container_width=True)
 
+       
         
     with hihello_tab:
         st.markdown("Taken from Hihello's [website](https://hifish.serv00.net/)")
@@ -402,7 +420,7 @@ with tab3:
                 col_ph.metric(label="pH", value=retrieved_data[2])
                 style_metric_cards()
 
-with tab4:
+with tab3:
         # Mock GPT-based API
     def get_gpt_response(message, context):
         # In a real scenario, this function would call the GPT API and get a response.
@@ -458,7 +476,7 @@ with tab4:
 
     image_row = row([1,8,1], vertical_align="center")
     image_row.empty()
-    image_row.image("https://raw.githubusercontent.com/JinukHong/shadowFunk/main/images/seina_banner_cropped_friendly.png")
+    image_row.image("https://raw.githubusercontent.com/etherealxx/shadowFunx/mj-fixchromedriver/images/seina_banner_cropped_more.png")
     image_row.empty()
     
     # Chatbot interface
@@ -504,7 +522,6 @@ with tab4:
             write(chatwrite(response))
             st.divider()
             write(chatwrite(translated_response))
-
 
 hide_footer_style = """
 <style>
