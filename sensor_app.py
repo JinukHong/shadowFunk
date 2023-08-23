@@ -191,7 +191,7 @@ with tab3:
 
         buttoncol1,buttoncol2 = st.columns(2)
         with buttoncol1:
-            st.write('Data provided by ShadowFunk team.')
+            st.markdown("Data provided by ShadowFunk team's [database](https://thingspeak.com/channels/2246162).")
         
         with buttoncol2:
             # with stylable_container(
@@ -343,7 +343,7 @@ with tab3:
     with inkofarm_tab:
         buttoncol1,buttoncol2 = st.columns(2)
         with buttoncol1:
-            st.markdown("Taken from Psyteam's [website](https://psyteam-fc61f.web.app/)")
+            st.markdown("Taken from Inkofarm's [database](https://thingspeak.com/channels/2246150/)")
         
         with buttoncol2:
             update_button = st.button("Update All Data", key="inkofarm_b")
