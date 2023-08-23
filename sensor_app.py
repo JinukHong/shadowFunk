@@ -267,7 +267,7 @@ with tab3:
         forecast_dates = pd.date_range(start=forecast_start_date, end=forecast_end_date, freq='H')
 
     # Temperature
-        st.markdown('### Temperature and Forecast')
+        col1.markdown('### Temperature and Forecast')
         fig_temp = go.Figure()
         fig_temp.add_trace(go.Scatter(x=data["DateTime"], y=data["Temperature"], mode='lines+markers', name='Actual'))
         fig_temp.add_trace(go.Scatter(x=forecast_dates, y=forecast_temperature_arima, mode='lines', name='Forecast'))
@@ -286,7 +286,7 @@ with tab3:
         # st.subheader('pH Level over Time')
         # fig2 = px.line(data, x="created_at", y="field2", title='PH', markers=True)  # Assuming field1 is temperature
         # st.plotly_chart(fig2, use_container_width=True)
-        st.markdown('### PH and Forecast')
+        col2.markdown('### PH and Forecast')
         fig_ph = go.Figure()
         fig_ph.add_trace(go.Scatter(x=data["DateTime"], y=data["PH"], mode='lines+markers', name='Actual'))
         fig_ph.add_trace(go.Scatter(x=forecast_dates, y=forecast_pH_arima, mode='lines', name='Forecast'))
