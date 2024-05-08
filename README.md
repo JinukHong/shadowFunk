@@ -2,6 +2,17 @@
 
 Check this link for our team's work process and result: https://windboy.pusan.ac.kr/issue/issueView?idx=863
 
+<details>
+<summary>1st Place Award 🥇</summary>
+<div markdown="1">
+
+[[상장] 창의충전소 1st(Shadow Funk).pdf](https://github.com/JinukHong/shadowFunk/files/15250207/1st.Shadow.Funk.pdf)
+
+
+</div>
+</details>
+
+
 ## Presentation
 
 <img width="1470" alt="image" src="https://github.com/JinukHong/shadowFunk/assets/45095330/017d2486-0c1c-467d-9bc7-c5f15f5faf9b">
