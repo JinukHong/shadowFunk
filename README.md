@@ -1,5 +1,9 @@
 # shadowFunk
 
+Check this link for our team's work process and result: https://windboy.pusan.ac.kr/issue/issueView?idx=863
+
+## Presentation
+
 <img width="1470" alt="image" src="https://github.com/JinukHong/shadowFunk/assets/45095330/017d2486-0c1c-467d-9bc7-c5f15f5faf9b">
 <img width="1470" alt="image" src="https://github.com/JinukHong/shadowFunk/assets/45095330/326ba334-841f-4069-af52-b4c3a6cc8057">
 <img width="1470" alt="image" src="https://github.com/JinukHong/shadowFunk/assets/45095330/f3665cd3-129a-4f88-83db-2de486f36f7b">
